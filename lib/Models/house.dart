@@ -9,6 +9,7 @@ class House {
   final String image;
   final int price;
   final int bedrooms;
+  final int bathrooms;
   final int size;
   final String description;
   final String zip;
@@ -21,6 +22,7 @@ class House {
     required this.image,
     required this.price,
     required this.bedrooms,
+    required this.bathrooms,
     required this.size,
     required this.description,
     required this.zip,

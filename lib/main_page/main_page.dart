@@ -20,14 +20,17 @@ class _MainPageState extends State<MainPage> {
   final client = ApiClient();
 
   void search() {
-    final query = textEditingController.text;
-    if (query.isNotEmpty) {
-      _filteredHouses = _houses.where((House house) {
-        return house.zip.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    } else {
-      _filteredHouses = _houses;
-    }
+    final query = textEditingController.text.replaceAll(' ', '').toLowerCase();
+  if (query.isNotEmpty) {
+    _filteredHouses = _houses.where((House house) {
+      final zipWithoutSpaces = house.zip.replaceAll(' ', '').toLowerCase();
+      final cityWithoutSpaces = house.city.replaceAll(' ', '').toLowerCase();
+      
+      return zipWithoutSpaces.contains(query) || cityWithoutSpaces.contains(query);
+    }).toList();
+  } else {
+    _filteredHouses = _houses;
+  }
 
     setState(() {});
   }
@@ -43,8 +46,9 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> getHouses() async {
     final houses = await client.getHouses();
-    _houses = houses;
-    _filteredHouses = houses;
+    houses.sort((a, b) => a.price.compareTo(b.price));
+    _houses = List.from(houses);
+    _filteredHouses = List.from(houses);
     setState(() {});
     print(houses);
   }
@@ -53,51 +57,54 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        _filteredHouses.isEmpty? 
-        const EmptyStateWidget() 
-        : ListView.builder(
-          padding: const EdgeInsets.only(top: 60),
-          itemCount: _filteredHouses.length,
-          itemExtent: 152,
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          itemBuilder: (BuildContext context, int index) {
-            final house = _filteredHouses[index];
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          offset: const Offset(0, 2),
-                          blurRadius: 5,
-                        )
+        _filteredHouses.isEmpty
+            ? const EmptyStateWidget()
+            : ListView.builder(
+                padding: const EdgeInsets.only(top: 60),
+                itemCount: _filteredHouses.length,
+                itemExtent: 132,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                itemBuilder: (BuildContext context, int index) {
+                  final house = _filteredHouses[index];
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                offset: const Offset(0, 2),
+                                blurRadius: 5,
+                              )
+                            ],
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                            child: ItemHouseWidget(house: house),
+                          ),
+                        ),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            onTap: () {
+                              print('tap item');
+                            },
+                          ),
+                        ),
                       ],
                     ),
-                    clipBehavior: Clip.hardEdge,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: ItemHouseWidget(house: house),
-                    ),
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      onTap: () {
-                        print('tap item');
-                      },
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
-            );
-          },
-        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
           child: SearchWidget(textEditingController: textEditingController),
@@ -120,8 +127,8 @@ class ItemHouseWidget extends StatelessWidget {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       ClipRRect(
         borderRadius: BorderRadius.circular(6.0),
-        child: Image.asset(
-          'images/ic_placeholder.png',
+        child: Image.network(
+          'https://intern.d-tt.nl${house.image}',
           width: 80,
           height: 80,
           fit: BoxFit.cover,
@@ -140,16 +147,16 @@ class ItemHouseWidget extends StatelessWidget {
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
-                house.zip,
+                '${house.zip.replaceAll(' ', '')} ${house.city}',
                 style:
                     const TextStyle(fontSize: 14, color: AppColor.mediumColor),
               ),
               const Spacer(),
-              const Row(
+              Row(
                 children: [
-                  IconWidget(imageString: AppImages.bed, string: '1'),
-                  IconWidget(imageString: AppImages.shower, string: '1'),
-                  IconWidget(imageString: AppImages.mapLayer, string: '46'),
+                  IconWidget(imageString: AppImages.bed, string: '${house.bedrooms}'),
+                  IconWidget(imageString: AppImages.shower, string: '${house.bathrooms}'),
+                  IconWidget(imageString: AppImages.mapLayer, string: '${house.size}'),
                   IconWidget(imageString: AppImages.location, string: '54.6km'),
                 ],
               ),
