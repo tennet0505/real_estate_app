@@ -10,4 +10,6 @@ abstract class AppImages {
   static const mapLayer = 'images/ic_map_layer.png';
   static const fire = 'images/ic_fire.png';
   static const arrow = 'images/ic_arrow.png';
+  static const location = 'images/ic_location.png';
+  static const emptyState = 'images/search_state_empty.png';
 }

@@ -3,6 +3,7 @@ import 'package:real_estate_app/Models/house.dart';
 import 'package:real_estate_app/Theme/app_color.dart';
 import 'package:real_estate_app/Theme/app_images.dart';
 import 'package:real_estate_app/api_client.dart';
+import 'package:real_estate_app/main_page/empty_state_widget.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -15,8 +16,9 @@ class _MainPageState extends State<MainPage> {
   final textEditingController = TextEditingController();
   var _houses = <House>[];
   var _filteredHouses = <House>[];
+  var isSearchEmpty = false;
   final client = ApiClient();
-  
+
   void search() {
     final query = textEditingController.text;
     if (query.isNotEmpty) {
@@ -26,17 +28,17 @@ class _MainPageState extends State<MainPage> {
     } else {
       _filteredHouses = _houses;
     }
+
     setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-     getHouses();
+    getHouses();
 
     _filteredHouses = _houses;
     textEditingController.addListener(search);
-   
   }
 
   Future<void> getHouses() async {
@@ -51,7 +53,9 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ListView.builder(
+        _filteredHouses.isEmpty? 
+        const EmptyStateWidget() 
+        : ListView.builder(
           padding: const EdgeInsets.only(top: 60),
           itemCount: _filteredHouses.length,
           itemExtent: 152,
@@ -59,7 +63,7 @@ class _MainPageState extends State<MainPage> {
           itemBuilder: (BuildContext context, int index) {
             final house = _filteredHouses[index];
             return Padding(
-              padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
               child: Stack(
                 children: [
                   Container(
@@ -77,57 +81,7 @@ class _MainPageState extends State<MainPage> {
                     clipBehavior: Clip.hardEdge,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(6.0),
-                              child: Image.asset(
-                                'images/ic_placeholder.png',
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '\$${house.price}',
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    house.zip,
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: AppColor.mediumColor),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    children: [
-                                      Image.asset(
-                                        AppImages.bed,
-                                        width: 14,
-                                        height: 14,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      const Text(
-                                        '1',
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(fontSize: 12),
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ]),
+                      child: ItemHouseWidget(house: house),
                     ),
                   ),
                   Material(
@@ -145,8 +99,93 @@ class _MainPageState extends State<MainPage> {
           },
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(32, 8, 32, 0),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
           child: SearchWidget(textEditingController: textEditingController),
+        ),
+      ],
+    );
+  }
+}
+
+class ItemHouseWidget extends StatelessWidget {
+  final House house;
+
+  const ItemHouseWidget({
+    super.key,
+    required this.house,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(6.0),
+        child: Image.asset(
+          'images/ic_placeholder.png',
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+        ),
+      ),
+      const SizedBox(width: 16),
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '\$${house.price}',
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                house.zip,
+                style:
+                    const TextStyle(fontSize: 14, color: AppColor.mediumColor),
+              ),
+              const Spacer(),
+              const Row(
+                children: [
+                  IconWidget(imageString: AppImages.bed, string: '1'),
+                  IconWidget(imageString: AppImages.shower, string: '1'),
+                  IconWidget(imageString: AppImages.mapLayer, string: '46'),
+                  IconWidget(imageString: AppImages.location, string: '54.6km'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ]);
+  }
+}
+
+class IconWidget extends StatelessWidget {
+  final String imageString;
+  final String string;
+  const IconWidget(
+      {super.key, required this.imageString, required this.string});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Image.asset(
+          color: AppColor.mediumColor,
+          imageString,
+          width: 14,
+          height: 14,
+        ),
+        const SizedBox(width: 2),
+        Text(
+          string,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 10, color: AppColor.mediumColor),
+        ),
+        const SizedBox(
+          width: 16,
         ),
       ],
     );
