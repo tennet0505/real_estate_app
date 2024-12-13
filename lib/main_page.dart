@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/Models/house.dart';
 import 'package:real_estate_app/Theme/app_color.dart';
 import 'package:real_estate_app/Theme/app_images.dart';
+import 'package:real_estate_app/api_client.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -11,13 +13,38 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final textEditingController = TextEditingController();
-
-  void search() {}
+  var _houses = <House>[];
+  var _filteredHouses = <House>[];
+  final client = ApiClient();
+  
+  void search() {
+    final query = textEditingController.text;
+    if (query.isNotEmpty) {
+      _filteredHouses = _houses.where((House house) {
+        return house.zip.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+    } else {
+      _filteredHouses = _houses;
+    }
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
+     getHouses();
+
+    _filteredHouses = _houses;
     textEditingController.addListener(search);
+   
+  }
+
+  Future<void> getHouses() async {
+    final houses = await client.getHouses();
+    _houses = houses;
+    _filteredHouses = houses;
+    setState(() {});
+    print(houses);
   }
 
   @override
@@ -26,10 +53,11 @@ class _MainPageState extends State<MainPage> {
       children: [
         ListView.builder(
           padding: const EdgeInsets.only(top: 60),
-          itemCount: 10,
+          itemCount: _filteredHouses.length,
           itemExtent: 152,
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           itemBuilder: (BuildContext context, int index) {
+            final house = _filteredHouses[index];
             return Padding(
               padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
               child: Stack(
@@ -53,14 +81,12 @@ class _MainPageState extends State<MainPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                  6.0), 
+                              borderRadius: BorderRadius.circular(6.0),
                               child: Image.asset(
                                 'images/ic_placeholder.png',
-                                width: 80, 
+                                width: 80,
                                 height: 80,
-                                fit: BoxFit
-                                    .cover, 
+                                fit: BoxFit.cover,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -69,14 +95,15 @@ class _MainPageState extends State<MainPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(height: 4),
-                                  const Text(
-                                    '45,000',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                  Text(
+                                    '\$${house.price}',
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                  const Text(
-                                    'time ',
-                                    style: TextStyle(
+                                  Text(
+                                    house.zip,
+                                    style: const TextStyle(
                                         fontSize: 14,
                                         color: AppColor.mediumColor),
                                   ),
