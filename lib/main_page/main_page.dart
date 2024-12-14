@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/Models/house.dart';
-import 'package:real_estate_app/Theme/app_color.dart';
-import 'package:real_estate_app/Theme/app_images.dart';
-import 'package:real_estate_app/api_client.dart';
+import 'package:real_estate_app/helpers/app_color.dart';
+import 'package:real_estate_app/helpers/app_images.dart';
+import 'package:real_estate_app/clients/api_client.dart';
+import 'package:real_estate_app/helpers/constants.dart';
+import 'package:real_estate_app/clients/geo_client.dart';
 import 'package:real_estate_app/main_page/empty_state_widget.dart';
 
 class MainPage extends StatefulWidget {
@@ -18,21 +20,44 @@ class _MainPageState extends State<MainPage> {
   var _filteredHouses = <House>[];
   var isSearchEmpty = false;
   final client = ApiClient();
+  final geoClient = GeoClient();
 
   void search() {
     final query = textEditingController.text.replaceAll(' ', '').toLowerCase();
-  if (query.isNotEmpty) {
-    _filteredHouses = _houses.where((House house) {
-      final zipWithoutSpaces = house.zip.replaceAll(' ', '').toLowerCase();
-      final cityWithoutSpaces = house.city.replaceAll(' ', '').toLowerCase();
-      
-      return zipWithoutSpaces.contains(query) || cityWithoutSpaces.contains(query);
-    }).toList();
-  } else {
-    _filteredHouses = _houses;
+    if (query.isNotEmpty) {
+      _filteredHouses = _houses.where((House house) {
+        final zipWithoutSpaces = house.zip.replaceAll(' ', '').toLowerCase();
+        final cityWithoutSpaces = house.city.replaceAll(' ', '').toLowerCase();
+        return zipWithoutSpaces.contains(query) ||
+            cityWithoutSpaces.contains(query);
+      }).toList();
+    } else {
+      _filteredHouses = _houses;
+    }
+    setState(() {});
   }
 
-    setState(() {});
+  void calculateDistances() async {
+    try {
+      final position = await geoClient.getCurrentLocation();
+      final userLat = position.latitude;
+      final userLon = position.longitude;
+
+      setState(() {
+        _houses = _houses.map((house) {
+          final distance = geoClient.calculateDistance(
+            userLat,
+            userLon,
+            house.latitude,
+            house.longitude,
+          );
+          house.distanceFromUser = distance;
+          return house;
+        }).toList();
+      });
+    } catch (e) {
+      print('Error fetching location: $e');
+    }
   }
 
   @override
@@ -49,6 +74,7 @@ class _MainPageState extends State<MainPage> {
     houses.sort((a, b) => a.price.compareTo(b.price));
     _houses = List.from(houses);
     _filteredHouses = List.from(houses);
+    calculateDistances();
     setState(() {});
     print(houses);
   }
@@ -128,7 +154,7 @@ class ItemHouseWidget extends StatelessWidget {
       ClipRRect(
         borderRadius: BorderRadius.circular(6.0),
         child: Image.network(
-          'https://intern.d-tt.nl${house.image}',
+          '${Constants.mainUrl}${house.image}',
           width: 80,
           height: 80,
           fit: BoxFit.cover,
@@ -154,10 +180,17 @@ class ItemHouseWidget extends StatelessWidget {
               const Spacer(),
               Row(
                 children: [
-                  IconWidget(imageString: AppImages.bed, string: '${house.bedrooms}'),
-                  IconWidget(imageString: AppImages.shower, string: '${house.bathrooms}'),
-                  IconWidget(imageString: AppImages.mapLayer, string: '${house.size}'),
-                  IconWidget(imageString: AppImages.location, string: '54.6km'),
+                  IconWidget(
+                      imageString: AppImages.bed, string: '${house.bedrooms}'),
+                  IconWidget(
+                      imageString: AppImages.shower,
+                      string: '${house.bathrooms}'),
+                  IconWidget(
+                      imageString: AppImages.mapLayer, string: '${house.size}'),
+                  IconWidget(
+                      imageString: AppImages.location,
+                      string:
+                          '${house.distanceFromUser?.toStringAsFixed(2) ?? '0'} km'),
                 ],
               ),
             ],

@@ -17,7 +17,8 @@ class House {
   final double latitude;
   final double longitude;
   final String createdDate;
-  House({
+  double? distanceFromUser;
+  House(this.distanceFromUser, {
     required this.id,
     required this.image,
     required this.price,

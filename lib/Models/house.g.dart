@@ -7,6 +7,7 @@ part of 'house.dart';
 // **************************************************************************
 
 House _$HouseFromJson(Map<String, dynamic> json) => House(
+      (json['distanceFromUser'] as num?)?.toDouble(),
       id: (json['id'] as num).toInt(),
       image: json['image'] as String,
       price: (json['price'] as num).toInt(),
@@ -34,4 +35,5 @@ Map<String, dynamic> _$HouseToJson(House instance) => <String, dynamic>{
       'latitude': instance.latitude,
       'longitude': instance.longitude,
       'createdDate': instance.createdDate,
+      'distanceFromUser': instance.distanceFromUser,
     };

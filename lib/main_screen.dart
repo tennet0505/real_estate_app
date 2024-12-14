@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/Theme/app_color.dart';
+import 'package:real_estate_app/helpers/app_color.dart';
 import 'package:real_estate_app/about_page.dart';
 import 'package:real_estate_app/main_page/main_page.dart';
 
