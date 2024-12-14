@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/helpers/app_color.dart';
+import 'package:real_estate_app/main_page/detail_scree_widget.dart';
 import 'package:real_estate_app/main_screen.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         "/main_screen": (context) => const MyHomePage(),
+        "/detail_screen": (context) => const DetailScreen(),
       },
       initialRoute: "/main_screen",
     );

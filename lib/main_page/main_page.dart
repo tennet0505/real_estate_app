@@ -76,7 +76,6 @@ class _MainPageState extends State<MainPage> {
     _filteredHouses = List.from(houses);
     calculateDistances();
     setState(() {});
-    print(houses);
   }
 
   @override
@@ -122,7 +121,10 @@ class _MainPageState extends State<MainPage> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(8)),
                             onTap: () {
-                              print('tap item');
+                              Navigator.of(context).pushNamed(
+                                '/detail_screen',
+                                arguments: house,
+                              );
                             },
                           ),
                         ),
