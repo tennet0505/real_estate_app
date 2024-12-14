@@ -12,6 +12,7 @@ class ApiClient {
     final houses = json
         .map((dynamic e) => House.fromJson(e as Map<String, dynamic>))
         .toList();
+        houses.sort((a, b) => a.price.compareTo(b.price));
     return houses;
   }
 

@@ -71,7 +71,6 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> getHouses() async {
     final houses = await client.getHouses();
-    houses.sort((a, b) => a.price.compareTo(b.price));
     _houses = List.from(houses);
     _filteredHouses = List.from(houses);
     calculateDistances();
