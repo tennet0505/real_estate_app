@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/helpers/app_color.dart';
-import 'package:real_estate_app/main_page/detail_scree_widget.dart';
+import 'package:real_estate_app/main_page/detail_screen_widget.dart';
 import 'package:real_estate_app/main_screen.dart';
 
 void main() {

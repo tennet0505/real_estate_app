@@ -11,6 +11,9 @@ class DetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final house = ModalRoute.of(context)?.settings.arguments as House;
 
+    final staticMapUrl =
+    "https://maps.googleapis.com/maps/api/staticmap?center=${house.latitude},${house.longitude}&zoom=15&size=600x300&markers=color:red|${house.latitude},${house.longitude}&markers=color:blue|${house.latitude},${house.longitude}&key=AIzaSyAEODvDBEpxy10LhqMsrAMGNvX1yjnqUNM";
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -54,24 +57,27 @@ class DetailScreen extends StatelessWidget {
                       Row(
                         children: [
                           IconWidget(
-                              imageString: AppImages.bed,
-                              string: '${house.bedrooms}'),
+                            imageString: AppImages.bed,
+                            string: '${house.bedrooms}',
+                          ),
                           IconWidget(
-                              imageString: AppImages.shower,
-                              string: '${house.bathrooms}'),
+                            imageString: AppImages.shower,
+                            string: '${house.bathrooms}',
+                          ),
                           IconWidget(
-                              imageString: AppImages.mapLayer,
-                              string: '${house.size}'),
+                            imageString: AppImages.mapLayer,
+                            string: '${house.size}',
+                          ),
                           IconWidget(
-                              imageString: AppImages.location,
-                              string:
-                                  '${house.distanceFromUser?.toStringAsFixed(2) ?? '0'} km'),
+                            imageString: AppImages.location,
+                            string:
+                                '${house.distanceFromUser?.toStringAsFixed(2) ?? '0'} km',
+                          ),
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // Description
                   const Text(
                     'Description',
                     style: TextStyle(
@@ -85,7 +91,6 @@ class DetailScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                   ),
                   const SizedBox(height: 20),
-                  // Location
                   const Text(
                     'Location',
                     style: TextStyle(
@@ -94,14 +99,32 @@ class DetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
+                  // Replace placeholder with Google Map
                   Container(
                     height: 200,
                     width: double.infinity,
-                    color: Colors.grey[300], // Placeholder for map
-                    child: Center(
-                      child: Text(
-                        "house.location",
-                        style: TextStyle(color: Colors.grey[700]),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey[300],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        staticMapUrl,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: Text(
+                              'Unable to load map',
+                              style: TextStyle(color: Colors.grey[700]),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
