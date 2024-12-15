@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutWidget extends StatelessWidget {
   const AboutWidget({super.key});
@@ -48,10 +49,26 @@ class AboutWidget extends StatelessWidget {
               const SizedBox(
                 width: 16,
               ),
-              const Column(
+              Column(
                 children: [
-                  Text('by DTT'),
-                  Text('by DTT'),
+                  const Text('by DTT'),
+                  InkWell(
+                    onTap: () async {
+                      final Uri url = Uri.parse('https://www.d-tt.nl'); 
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                    child: const Text(
+                      'd-tt.nl',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],

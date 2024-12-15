@@ -75,7 +75,7 @@ class HouseImageSection extends StatelessWidget {
         ),
         Positioned(
           top: 48,
-          left: 16,
+          left: 8,
           child: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
@@ -167,6 +167,26 @@ class HouseLocationMap extends StatelessWidget {
       {super.key, required this.latitude, required this.longitude});
 
   Future<void> _openMap(BuildContext context) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location services are disabled')),
+      );
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location permission denied')),
+        );
+        return;
+    }
+    
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
@@ -174,16 +194,16 @@ class HouseLocationMap extends StatelessWidget {
       context: context,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.map),
-                title: Text('Open in Google Maps'),
+                leading: const Icon(Icons.map),
+                title: const Text('Open in Google Maps'),
                 onTap: () async {
                   Navigator.pop(context);
-                  await _openMapGoogle(context, position); // Pass position here
+                  await _openMapGoogle(context, position);
                 },
               ),
               if (Platform.isIOS) ...[
