@@ -5,6 +5,15 @@ import 'package:url_launcher/url_launcher.dart';
 class AboutWidget extends StatelessWidget {
   const AboutWidget({super.key});
 
+  Future<void> _launchURL() async {
+  final url = Uri.parse('https://www.d-tt.nl');
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -54,12 +63,7 @@ class AboutWidget extends StatelessWidget {
                   const Text('by DTT'),
                   InkWell(
                     onTap: () async {
-                      final Uri url = Uri.parse('https://www.d-tt.nl'); 
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(url);
-                      } else {
-                        throw 'Could not launch $url';
-                      }
+                      _launchURL;
                     },
                     child: const Text(
                       'd-tt.nl',
