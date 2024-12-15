@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:real_estate_app/data/clients/geo_client.dart';
 import 'package:real_estate_app/data/models/house.dart';
-import 'package:real_estate_app/presentation/helpers/constants.dart';
+import 'package:real_estate_app/constants.dart';
 
 class ApiClient {
   final HttpClient client = HttpClient();

@@ -4,7 +4,7 @@ import 'package:real_estate_app/business_logic/house_bloc.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_color.dart';
 import 'package:real_estate_app/presentation/helpers/app_images.dart';
-import 'package:real_estate_app/presentation/helpers/constants.dart';
+import 'package:real_estate_app/constants.dart';
 import 'package:real_estate_app/presentation/main_page/empty_state_widget.dart';
 
 class MainPage extends StatefulWidget {
@@ -26,6 +26,10 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  Future<void> _onRefresh() async {
+    context.read<HouseBloc>().add(const GetHouses());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -35,56 +39,59 @@ class _MainPageState extends State<MainPage> {
             if (state is HouseLoadingState) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is HouseState) {
-              return state.houses.isEmpty
-                  ? const EmptyStateWidget()
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(top: 60),
-                      itemCount: state.houses.length,
-                      itemExtent: 132,
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      itemBuilder: (context, index) {
-                        final house = state.houses[index];
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
-                          child: Stack(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      offset: const Offset(0, 2),
-                                      blurRadius: 5,
-                                    ),
-                                  ],
+              return RefreshIndicator(
+                onRefresh: _onRefresh, // Refresh handler
+                child: state.houses.isEmpty
+                    ? const EmptyStateWidget()
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(top: 60),
+                        itemCount: state.houses.length,
+                        itemExtent: 132,
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        itemBuilder: (context, index) {
+                          final house = state.houses[index];
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        offset: const Offset(0, 2),
+                                        blurRadius: 5,
+                                      ),
+                                    ],
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                                    child: ItemHouseWidget(house: house),
+                                  ),
                                 ),
-                                clipBehavior: Clip.hardEdge,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                                  child: ItemHouseWidget(house: house),
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(8),
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                        '/detail_screen',
+                                        arguments: house,
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                              Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(8),
-                                  onTap: () {
-                                    Navigator.of(context).pushNamed(
-                                      '/detail_screen',
-                                      arguments: house,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              );
             } else if (state is HouseErrorState) {
               return Center(
                 child: Text(

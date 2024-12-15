@@ -8,10 +8,10 @@ class EmptyStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColor.lightColor,
+      color: AppColor.lightGaryColor,
       child: Center(
           child: Padding(
-            padding: const EdgeInsets.only(left: 54, right: 54),
+            padding: const EdgeInsets.only(left: 54, right: 54, top: 24),
             child: Column(
                     mainAxisAlignment: MainAxisAlignment.center, // Centers items vertically
                     crossAxisAlignment: CrossAxisAlignment.center, // C

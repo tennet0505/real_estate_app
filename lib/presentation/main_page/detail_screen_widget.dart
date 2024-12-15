@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_images.dart';
-import 'package:real_estate_app/presentation/helpers/constants.dart';
+import 'package:real_estate_app/constants.dart';
 import 'package:real_estate_app/presentation/main_page/main_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailScreen extends StatelessWidget {
   const DetailScreen({super.key});
@@ -159,37 +163,109 @@ class HouseLocationMap extends StatelessWidget {
   final double latitude;
   final double longitude;
 
-  const HouseLocationMap({super.key, required this.latitude, required this.longitude});
+  const HouseLocationMap(
+      {super.key, required this.latitude, required this.longitude});
+
+  Future<void> _openMap(BuildContext context) async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Open in Google Maps'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _openMapGoogle(context, position); // Pass position here
+                },
+              ),
+              if (Platform.isIOS) ...[
+                ListTile(
+                  leading: Icon(Icons.map),
+                  title: Text('Open in Apple Maps'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await _openAppleMap(context);
+                  },
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openMapGoogle(BuildContext context, Position position) async {
+    final googleMapsUrl = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&origin=${position.latitude},${position.longitude}&destination=$latitude,$longitude');
+
+    try {
+      if (await canLaunchUrl(googleMapsUrl)) {
+        await launchUrl(googleMapsUrl);
+      } else {
+        throw 'Could not launch Google Maps';
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to open Google Maps')),
+      );
+    }
+  }
+
+  Future<void> _openAppleMap(BuildContext context) async {
+    final appleMapsUrl =
+        Uri.parse('http://maps.apple.com/?daddr=$latitude,$longitude');
+    try {
+      if (await canLaunchUrl(appleMapsUrl)) {
+        await launchUrl(appleMapsUrl);
+      } else {
+        throw 'Could not launch Apple Maps';
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final staticMapUrl =
-        "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&zoom=15&size=600x300&markers=color:red|$latitude,$longitude&key=API";
+        "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&zoom=15&size=600x300&markers=color:red|$latitude,$longitude&key=${Constants.apiKeyMaps}";
 
-    return Container(
-      height: 200,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.grey[300],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image.network(
-          staticMapUrl,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, progress) {
-            if (progress == null) return child;
-            return const Center(child: CircularProgressIndicator());
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return Center(
-              child: Text(
-                'Unable to load map',
-                style: TextStyle(color: Colors.grey[700]),
-              ),
-            );
-          },
+    return GestureDetector(
+      onTap: () => _openMap(context), // Trigger map selection on tap
+      child: Container(
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.grey[300],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            staticMapUrl,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return const Center(child: CircularProgressIndicator());
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return Center(
+                child: Text(
+                  'Unable to load map',
+                  style: TextStyle(color: Colors.grey[700]),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
