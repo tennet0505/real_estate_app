@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/helpers/app_color.dart';
-import 'package:real_estate_app/helpers/app_images.dart';
+import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:real_estate_app/presentation/helpers/app_images.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   const EmptyStateWidget({super.key});

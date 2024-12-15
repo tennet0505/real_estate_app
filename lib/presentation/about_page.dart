@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/helpers/app_color.dart';
+import 'package:real_estate_app/presentation/helpers/app_color.dart';
 
 class AboutWidget extends StatelessWidget {
   const AboutWidget({super.key});

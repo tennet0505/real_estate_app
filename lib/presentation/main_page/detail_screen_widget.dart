@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/Models/house.dart';
-import 'package:real_estate_app/helpers/app_images.dart';
-import 'package:real_estate_app/helpers/constants.dart';
-import 'package:real_estate_app/main_page/main_page.dart';
+import 'package:real_estate_app/data/models/house.dart';
+import 'package:real_estate_app/presentation/helpers/app_images.dart';
+import 'package:real_estate_app/presentation/helpers/constants.dart';
+import 'package:real_estate_app/presentation/main_page/main_page.dart';
 
 class DetailScreen extends StatelessWidget {
   const DetailScreen({super.key});
@@ -164,7 +164,7 @@ class HouseLocationMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final staticMapUrl =
-        "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&zoom=15&size=600x300&markers=color:red|$latitude,$longitude&key=AIzaSyBBIG5lr9UsrtA8g0ocnCB8gEPHK4Xwmas";
+        "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&zoom=15&size=600x300&markers=color:red|$latitude,$longitude&key=API";
 
     return Container(
       height: 200,

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/Models/house.dart';
-import 'package:real_estate_app/helpers/app_color.dart';
-import 'package:real_estate_app/helpers/app_images.dart';
-import 'package:real_estate_app/clients/api_client.dart';
-import 'package:real_estate_app/helpers/constants.dart';
-import 'package:real_estate_app/clients/geo_client.dart';
-import 'package:real_estate_app/main_page/empty_state_widget.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/data/models/house.dart';
+import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:real_estate_app/presentation/helpers/app_images.dart';
+import 'package:real_estate_app/presentation/helpers/constants.dart';
+import 'package:real_estate_app/presentation/main_page/empty_state_widget.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,122 +16,86 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final textEditingController = TextEditingController();
-  var _houses = <House>[];
-  var _filteredHouses = <House>[];
-  var isSearchEmpty = false;
-  final client = ApiClient();
-  final geoClient = GeoClient();
-
-  void search() {
-    final query = textEditingController.text.replaceAll(' ', '').toLowerCase();
-    if (query.isNotEmpty) {
-      _filteredHouses = _houses.where((House house) {
-        final zipWithoutSpaces = house.zip.replaceAll(' ', '').toLowerCase();
-        final cityWithoutSpaces = house.city.replaceAll(' ', '').toLowerCase();
-        return zipWithoutSpaces.contains(query) ||
-            cityWithoutSpaces.contains(query);
-      }).toList();
-    } else {
-      _filteredHouses = _houses;
-    }
-    setState(() {});
-  }
-
-  void calculateDistances() async {
-    try {
-      final position = await geoClient.getCurrentLocation();
-      final userLat = position.latitude;
-      final userLon = position.longitude;
-
-      setState(() {
-        _houses = _houses.map((house) {
-          final distance = geoClient.calculateDistance(
-            userLat,
-            userLon,
-            house.latitude,
-            house.longitude,
-          );
-          house.distanceFromUser = distance;
-          return house;
-        }).toList();
-      });
-    } catch (e) {
-      print('Error fetching location: $e');
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    getHouses();
-
-    _filteredHouses = _houses;
-    textEditingController.addListener(search);
-  }
-
-  Future<void> getHouses() async {
-    final houses = await client.getHouses();
-    _houses = List.from(houses);
-    _filteredHouses = List.from(houses);
-    calculateDistances();
-    setState(() {});
+    context.read<HouseBloc>().add(const GetHouses());
+    textEditingController.addListener(() {
+      context.read<HouseBloc>().add(SearchHouses(textEditingController.text));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        _filteredHouses.isEmpty
-            ? const EmptyStateWidget()
-            : ListView.builder(
-                padding: const EdgeInsets.only(top: 60),
-                itemCount: _filteredHouses.length,
-                itemExtent: 132,
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                itemBuilder: (BuildContext context, int index) {
-                  final house = _filteredHouses[index];
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
-                    child: Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                offset: const Offset(0, 2),
-                                blurRadius: 5,
-                              )
+        BlocBuilder<HouseBloc, HouseState>(
+          builder: (context, state) {
+            if (state is HouseLoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is HouseState) {
+              return state.houses.isEmpty
+                  ? const EmptyStateWidget()
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(top: 60),
+                      itemCount: state.houses.length,
+                      itemExtent: 132,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      itemBuilder: (context, index) {
+                        final house = state.houses[index];
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+                          child: Stack(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      offset: const Offset(0, 2),
+                                      blurRadius: 5,
+                                    ),
+                                  ],
+                                ),
+                                clipBehavior: Clip.hardEdge,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                                  child: ItemHouseWidget(house: house),
+                                ),
+                              ),
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(8),
+                                  onTap: () {
+                                    Navigator.of(context).pushNamed(
+                                      '/detail_screen',
+                                      arguments: house,
+                                    );
+                                  },
+                                ),
+                              ),
                             ],
                           ),
-                          clipBehavior: Clip.hardEdge,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                            child: ItemHouseWidget(house: house),
-                          ),
-                        ),
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                            onTap: () {
-                              Navigator.of(context).pushNamed(
-                                '/detail_screen',
-                                arguments: house,
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                        );
+                      },
+                    );
+            } else if (state is HouseErrorState) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+            return const EmptyStateWidget();
+          },
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
           child: SearchWidget(textEditingController: textEditingController),
@@ -234,12 +198,12 @@ class IconWidget extends StatelessWidget {
 }
 
 class SearchWidget extends StatelessWidget {
+  final TextEditingController textEditingController;
+
   const SearchWidget({
     super.key,
     required this.textEditingController,
   });
-
-  final TextEditingController textEditingController;
 
   @override
   Widget build(BuildContext context) {
@@ -247,7 +211,6 @@ class SearchWidget extends StatelessWidget {
       height: 40,
       child: TextField(
         cursorColor: AppColor.mediumColor,
-        cursorHeight: 14,
         controller: textEditingController,
         decoration: InputDecoration(
           label: const Text(
@@ -277,3 +240,4 @@ class SearchWidget extends StatelessWidget {
     );
   }
 }
+

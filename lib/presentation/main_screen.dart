@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/helpers/app_color.dart';
-import 'package:real_estate_app/about_page.dart';
-import 'package:real_estate_app/main_page/main_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/data/clients/repository.dart';
+import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:real_estate_app/presentation/about_page.dart';
+import 'package:real_estate_app/presentation/main_page/main_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -35,16 +38,18 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      body: IndexedStack(index: _selectedIndex, children: const [
-        MainPage(),
-        AboutWidget(),
+      body: IndexedStack(index: _selectedIndex, children: [
+        BlocProvider(
+            create: (context) => HouseBloc(HouseRepository()),
+            child: const MainPage()),
+        const AboutWidget(),
       ]),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1), 
-              spreadRadius: 2, 
+              color: Colors.black.withValues(alpha: 0.1),
+              spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, -2),
             ),
