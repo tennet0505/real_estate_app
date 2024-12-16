@@ -15,13 +15,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'DTT REAL ESTATE',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColor.lightGaryColor),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: AppColor.whiteColor,
-          selectedItemColor: AppColor.strongColor,
-          unselectedItemColor: AppColor.lightColor,
-       )
-      ),
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColor.lightGrayColor),
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: AppColor.whiteColor,
+            selectedItemColor: AppColor.strongColor,
+            unselectedItemColor: AppColor.lightColor,
+          )),
       routes: {
         "/main_screen": (context) => const MyHomePage(),
         "/detail_screen": (context) => const DetailScreen(),
@@ -30,4 +29,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

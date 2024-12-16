@@ -8,23 +8,24 @@ class EmptyStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColor.lightGaryColor,
+      color: AppColor.lightGrayColor,
       child: Center(
           child: Padding(
-            padding: const EdgeInsets.only(left: 54, right: 54, top: 24),
-            child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center, // Centers items vertically
-                    crossAxisAlignment: CrossAxisAlignment.center, // C
-                    children: [
+        padding: const EdgeInsets.only(left: 54, right: 54, top: 24),
+        child: Column(
+          mainAxisAlignment:
+              MainAxisAlignment.center, // Centers items vertically
+          crossAxisAlignment: CrossAxisAlignment.center, // C
+          children: [
             Image.asset(AppImages.emptyState),
             const SizedBox(height: 48),
             const Text('No results founds',
                 style: TextStyle(fontSize: 16, color: AppColor.mediumColor)),
             const Text('Perhaps try another search?',
                 style: TextStyle(fontSize: 16, color: AppColor.mediumColor)),
-                    ],
-                  ),
-          )),
+          ],
+        ),
+      )),
     );
   }
 }

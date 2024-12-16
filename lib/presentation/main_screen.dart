@@ -28,16 +28,22 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        backgroundColor: AppColor.lightGaryColor,
-        title: const Text(
-          'DTT REAL ESTATE',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      appBar: _selectedIndex == 1
+          ? null // Hide the AppBar when AboutPage is selected
+          : AppBar(
+              centerTitle: false,
+              backgroundColor: AppColor.lightGrayColor,
+              title: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: const Text(
+                  'DTT REAL ESTATE',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'GothamSSm',
+                  ),
+                ),
+              ),
+            ),
       body: IndexedStack(index: _selectedIndex, children: [
         BlocProvider(
             create: (context) => HouseBloc(HouseRepository()),

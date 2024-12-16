@@ -5,6 +5,8 @@ import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_color.dart';
 import 'package:real_estate_app/presentation/helpers/app_images.dart';
 import 'package:real_estate_app/constants.dart';
+import 'package:real_estate_app/presentation/helpers/currency_formater.dart';
+import 'package:real_estate_app/presentation/helpers/distance_helper.dart';
 import 'package:real_estate_app/presentation/main_page/empty_state_widget.dart';
 
 class MainPage extends StatefulWidget {
@@ -32,82 +34,85 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        BlocBuilder<HouseBloc, HouseState>(
-          builder: (context, state) {
-            if (state is HouseLoadingState) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is HouseState) {
-              return RefreshIndicator(
-                onRefresh: _onRefresh, // Refresh handler
-                child: state.houses.isEmpty
-                    ? const EmptyStateWidget()
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(top: 60),
-                        itemCount: state.houses.length,
-                        itemExtent: 132,
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        itemBuilder: (context, index) {
-                          final house = state.houses[index];
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        offset: const Offset(0, 2),
-                                        blurRadius: 5,
-                                      ),
-                                    ],
+    return Container(
+      color: AppColor.lightGrayColor,
+      child: Stack(
+        children: [
+          BlocBuilder<HouseBloc, HouseState>(
+            builder: (context, state) {
+              if (state is HouseLoadingState) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is HouseState) {
+                return RefreshIndicator(
+                  onRefresh: _onRefresh, // Refresh handler
+                  child: state.houses.isEmpty
+                      ? const EmptyStateWidget()
+                      : ListView.builder(
+                          padding: const EdgeInsets.only(top: 54),
+                          itemCount: state.houses.length,
+                          itemExtent: 128,
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          itemBuilder: (context, index) {
+                            final house = state.houses[index];
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          offset: const Offset(0, 2),
+                                          blurRadius: 5,
+                                        ),
+                                      ],
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(18, 8, 8, 8),
+                                      child: ItemHouseWidget(house: house),
+                                    ),
                                   ),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                                    child: ItemHouseWidget(house: house),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(8),
+                                      onTap: () {
+                                        Navigator.of(context).pushNamed(
+                                          '/detail_screen',
+                                          arguments: house,
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
-                                Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
-                                      Navigator.of(context).pushNamed(
-                                        '/detail_screen',
-                                        arguments: house,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-              );
-            } else if (state is HouseErrorState) {
-              return Center(
-                child: Text(
-                  state.message,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              );
-            }
-            return const EmptyStateWidget();
-          },
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-          child: SearchWidget(textEditingController: textEditingController),
-        ),
-      ],
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                );
+              } else if (state is HouseErrorState) {
+                return Center(
+                  child: Text(
+                    state.message,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                );
+              }
+              return const EmptyStateWidget();
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+            child: SearchWidget(textEditingController: textEditingController),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -124,45 +129,60 @@ class ItemHouseWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       ClipRRect(
-        borderRadius: BorderRadius.circular(6.0),
+        borderRadius: BorderRadius.circular(8.0),
         child: Image.network(
           '${Constants.mainUrl}${house.image}',
-          width: 80,
-          height: 80,
+          width: 74,
+          height: 74,
           fit: BoxFit.cover,
         ),
       ),
       const SizedBox(width: 16),
       Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(top: 8, bottom: 10),
+          padding: const EdgeInsets.only(top: 6, bottom: 10),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '\$${house.price}',
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                formatCurrency(house.price),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.1,
+                ),
               ),
               Text(
                 '${house.zip.replaceAll(' ', '')} ${house.city}',
-                style:
-                    const TextStyle(fontSize: 14, color: AppColor.mediumColor),
+                style: const TextStyle(
+                  fontSize: 10,
+                  height: 0.8,
+                  color: AppColor.mediumColor,
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: 0.1,
+                  fontFamily: 'GothamSSm',
+                ),
               ),
               const Spacer(),
               Row(
                 children: [
                   IconWidget(
-                      imageString: AppImages.bed, string: '${house.bedrooms}'),
+                      imageString: AppImages.bed,
+                      string: '${house.bedrooms}',
+                      isDetailScreen: false),
                   IconWidget(
                       imageString: AppImages.shower,
-                      string: '${house.bathrooms}'),
+                      string: '${house.bathrooms}',
+                      isDetailScreen: false),
                   IconWidget(
-                      imageString: AppImages.mapLayer, string: '${house.size}'),
+                      imageString: AppImages.mapLayer,
+                      string: '${house.size}',
+                      isDetailScreen: false),
                   IconWidget(
                       imageString: AppImages.location,
-                      string:
-                          '${house.distanceFromUser?.toStringAsFixed(2) ?? '0'} km'),
+                      string: formatDistance(house.distanceFromUser),
+                      isDetailScreen: false),
                 ],
               ),
             ],
@@ -175,9 +195,13 @@ class ItemHouseWidget extends StatelessWidget {
 
 class IconWidget extends StatelessWidget {
   final String imageString;
+  final bool isDetailScreen;
   final String string;
   const IconWidget(
-      {super.key, required this.imageString, required this.string});
+      {super.key,
+      required this.imageString,
+      required this.string,
+      this.isDetailScreen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -186,18 +210,24 @@ class IconWidget extends StatelessWidget {
         Image.asset(
           color: AppColor.mediumColor,
           imageString,
-          width: 14,
-          height: 14,
+          width: isDetailScreen ? 14 : 12,
+          height: isDetailScreen ? 16 : 14,
         ),
-        const SizedBox(width: 2),
+        SizedBox(width: isDetailScreen ? 2 : 4),
         Text(
           string,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 10, color: AppColor.mediumColor),
+          style: TextStyle(
+            fontSize: isDetailScreen ? 10 : 8,
+            color: AppColor.mediumColor,
+            fontWeight: FontWeight.w400,
+            letterSpacing: 0.1,
+            fontFamily: 'GothamSSm',
+          ),
         ),
-        const SizedBox(
-          width: 16,
+        SizedBox(
+          width: isDetailScreen ? 16 : 20,
         ),
       ],
     );
@@ -222,10 +252,15 @@ class SearchWidget extends StatelessWidget {
         decoration: InputDecoration(
           label: const Text(
             'Search for a home',
-            style: TextStyle(color: AppColor.mediumColor),
+            style: TextStyle(
+              color: AppColor.mediumColor,
+              fontWeight: FontWeight.w300,
+              letterSpacing: 0.1,
+              fontFamily: 'GothamSSm',
+            ),
           ),
           filled: true,
-          fillColor: AppColor.darkGaryColor,
+          fillColor: AppColor.darkGrayColor,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide.none,
@@ -247,4 +282,3 @@ class SearchWidget extends StatelessWidget {
     );
   }
 }
-

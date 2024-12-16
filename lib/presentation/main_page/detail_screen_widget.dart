@@ -3,8 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:real_estate_app/data/models/house.dart';
+import 'package:real_estate_app/presentation/helpers/app_color.dart';
 import 'package:real_estate_app/presentation/helpers/app_images.dart';
 import 'package:real_estate_app/constants.dart';
+import 'package:real_estate_app/presentation/helpers/currency_formater.dart';
+import 'package:real_estate_app/presentation/helpers/distance_helper.dart';
 import 'package:real_estate_app/presentation/main_page/main_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,35 +23,59 @@ class DetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            HouseImageSection(imageUrl: '${Constants.mainUrl}${house.image}'),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  HousePriceInfo(
-                    price: '\$${house.price}',
-                    bedrooms: house.bedrooms,
-                    bathrooms: house.bathrooms,
-                    size: house.size,
-                    distanceFromUser: house.distanceFromUser,
-                  ),
-                  const SizedBox(height: 20),
-                  HouseDescription(description: house.description),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Location',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                HouseImageSection(
+                    imageUrl: '${Constants.mainUrl}${house.image}'),
+                Positioned(
+                  bottom: 0, // Align to bottom of the image
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: AppColor.lightGrayColor, // White background
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18),
+                      ), // Rounded corners
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  HouseLocationMap(
-                    latitude: house.latitude,
-                    longitude: house.longitude,
-                  ),
-                ],
+                ),
+              ],
+            ),
+            Container(
+              color: AppColor.lightGrayColor,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HousePriceInfo(
+                      price: formatCurrency(house.price),
+                      bedrooms: house.bedrooms,
+                      bathrooms: house.bathrooms,
+                      size: house.size,
+                      distanceFromUser: house.distanceFromUser,
+                    ),
+                    const SizedBox(height: 30),
+                    HouseDescription(description: house.description),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Location',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    HouseLocationMap(
+                      latitude: house.latitude,
+                      longitude: house.longitude,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -70,7 +97,7 @@ class HouseImageSection extends StatelessWidget {
         Image.network(
           imageUrl,
           width: double.infinity,
-          height: 232,
+          height: 248,
           fit: BoxFit.cover,
         ),
         Positioned(
@@ -107,24 +134,27 @@ class HousePriceInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           price,
           style: const TextStyle(
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(width: 16),
         Row(
           children: [
-            IconWidget(imageString: AppImages.bed, string: '$bedrooms'),
-            IconWidget(imageString: AppImages.shower, string: '$bathrooms'),
-            IconWidget(imageString: AppImages.mapLayer, string: '$size'),
             IconWidget(
-              imageString: AppImages.location,
-              string: '${distanceFromUser?.toStringAsFixed(2) ?? '0'} km',
-            ),
+                imageString: AppImages.bed, string: '$bedrooms', isDetailScreen: true),
+            IconWidget(
+                imageString: AppImages.shower, string: '$bathrooms', isDetailScreen: true),
+            IconWidget(
+                imageString: AppImages.mapLayer, string: '$size', isDetailScreen: true),
+            IconWidget(
+                imageString: AppImages.location,
+                string: formatDistance(distanceFromUser),
+                isDetailScreen: true),
           ],
         ),
       ],
@@ -149,10 +179,17 @@ class HouseDescription extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         Text(
           description,
-          style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[700],
+            height: 1.3,
+            fontWeight: FontWeight.w300,
+            letterSpacing: 0.5,
+            fontFamily: 'GothamSSm',
+          ),
         ),
       ],
     );
@@ -179,14 +216,15 @@ class HouseLocationMap extends StatelessWidget {
     }
 
     permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       permission = await Geolocator.requestPermission();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location permission denied')),
-        );
-        return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location permission denied')),
+      );
+      return;
     }
-    
+
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
@@ -262,10 +300,9 @@ class HouseLocationMap extends StatelessWidget {
     return GestureDetector(
       onTap: () => _openMap(context), // Trigger map selection on tap
       child: Container(
-        height: 200,
+        height: 240,
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
           color: Colors.grey[300],
         ),
         child: ClipRRect(

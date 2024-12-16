@@ -6,78 +6,85 @@ class AboutWidget extends StatelessWidget {
   const AboutWidget({super.key});
 
   Future<void> _launchURL() async {
-  final url = Uri.parse('https://www.d-tt.nl');
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url);
-  } else {
-    throw 'Could not launch $url';
+    final url = Uri.parse('https://www.d-tt.nl');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'ABOUT',
-            style: TextStyle(
-              color: AppColor.strongColor,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.',
-            style: TextStyle(
-              color: AppColor.mediumColor,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(
-            height: 32,
-          ),
-          const Text(
-            'Design and Development',
-            style: TextStyle(
-              color: AppColor.strongColor,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 32),
-          Row(
-            children: [
-              Image.asset(
-                'images/dtt_banner.png',
-                width: 150,
+    return Container(
+      color: AppColor.lightGrayColor,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 70, 24, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'ABOUT',
+              style: TextStyle(
+                color: AppColor.strongColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(
-                width: 16,
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.',
+              style: TextStyle(
+                color: AppColor.mediumColor,
+                fontSize: 14,
+                height: 1.1,
+                fontWeight: FontWeight.w300,
+                letterSpacing: 0.2,
+                fontFamily: 'GothamSSm',
               ),
-              Column(
-                children: [
-                  const Text('by DTT'),
-                  InkWell(
-                    onTap: () async {
-                      _launchURL;
-                    },
-                    child: const Text(
-                      'd-tt.nl',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.blue,
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            const Text(
+              'Design and Development',
+              style: TextStyle(
+                color: AppColor.strongColor,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Image.asset(
+                  'images/dtt_banner.png',
+                  width: 136,
+                ),
+                const SizedBox(
+                  width: 22,
+                ),
+                Column(
+                  children: [
+                    const Text('by DTT'),
+                    InkWell(
+                      onTap: () async {
+                        _launchURL;
+                      },
+                      child: const Text(
+                        'd-tt.nl',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.blue,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
