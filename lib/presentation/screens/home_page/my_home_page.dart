@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
-import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:real_estate_app/theme/app_color.dart';
 import 'package:real_estate_app/presentation/widgets/about_page.dart';
 import 'package:real_estate_app/presentation/screens/home_page/home_page.dart';
 
@@ -32,14 +32,15 @@ class _MyHomePageState extends State<MyHomePage> {
           ? null // Hide the AppBar when AboutPage is selected
           : AppBar(
               centerTitle: false,
-              backgroundColor: AppColor.lightGrayColor,
+              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
               title: Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: const Text(
+                child: Text(
                   'DTT REAL ESTATE',
                   style: TextStyle(
                     fontSize: 18,
                     fontFamily: 'GothamSSm',
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                 ),
               ),

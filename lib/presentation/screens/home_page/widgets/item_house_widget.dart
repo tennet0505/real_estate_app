@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/constants.dart';
 import 'package:real_estate_app/data/models/house.dart';
-import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:real_estate_app/theme/app_color.dart';
 import 'package:real_estate_app/presentation/helpers/app_images.dart';
 import 'package:real_estate_app/presentation/helpers/currency_formater.dart';
 import 'package:real_estate_app/presentation/helpers/distance_helper.dart';
@@ -40,15 +40,16 @@ class ItemHouseWidget extends StatelessWidget {
             children: [
               Text(
                 formatCurrency(house.price),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.1,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
                 ),
               ),
               Text(
                 '${house.zip.replaceAll(' ', '')} ${house.city}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   height: 0.8,
                   color: AppColor.mediumColor,

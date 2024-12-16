@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
-import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:real_estate_app/theme/app_color.dart';
 import 'package:real_estate_app/presentation/helpers/app_images.dart';
 import 'package:real_estate_app/presentation/screens/home_page/widgets/list_item_widget.dart';
 import 'package:real_estate_app/presentation/screens/home_page/widgets/search_widget.dart';
@@ -32,9 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColor.lightGrayColor,
-      child: Stack(
+    return Stack(
         children: [
           BlocBuilder<HouseBloc, HouseState>(
             builder: (context, state) {
@@ -58,9 +56,12 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         state.message,
                         style: TextStyle(
-                            fontSize: 16, color: AppColor.mediumColor),
+                            fontSize: 16, color: Theme.of(context).textTheme.titleLarge?.color),
                       ),
                       TextButton(
+                        style: ButtonStyle(
+                          foregroundColor: WidgetStateProperty.all(Theme.of(context).textTheme.titleLarge?.color),
+                        ),
                         onPressed: _onRefresh,
                         child: Text('Refresh'),
                       ),
@@ -69,6 +70,8 @@ class _HomePageState extends State<HomePage> {
                 );
               } else if (state is HouseState) {
                 return RefreshIndicator(
+                  color: AppColor.backgroundColorDarkTertiary,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
                   onRefresh: _onRefresh, // Refresh handler
                   child: state.houses.isEmpty
                       ? const EmptyStateWidget()
@@ -100,7 +103,6 @@ class _HomePageState extends State<HomePage> {
             child: SearchWidget(textEditingController: textEditingController),
           ),
         ],
-      ),
     );
   }
 }

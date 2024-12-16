@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/constants.dart';
-import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:real_estate_app/theme/app_color.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutWidget extends StatelessWidget {
@@ -21,12 +21,12 @@ class AboutWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'ABOUT',
               style: TextStyle(
-                color: AppColor.strongColor,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.titleLarge?.color,
               ),
             ),
             const SizedBox(height: 24),
@@ -44,12 +44,12 @@ class AboutWidget extends StatelessWidget {
             const SizedBox(
               height: 30,
             ),
-            const Text(
+            Text(
               'Design and Development',
               style: TextStyle(
-                color: AppColor.strongColor,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.titleLarge?.color,
               ),
             ),
             const SizedBox(height: 24),
@@ -64,7 +64,12 @@ class AboutWidget extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    const Text('by DTT'),
+                    Text(
+                      'by DTT',
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                      ),
+                    ),
                     InkWell(
                       onTap: () async {
                         _launchURL(Constants.webSiteUrl);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/presentation/helpers/app_color.dart';
+import 'package:real_estate_app/theme/app_color.dart';
 import 'package:real_estate_app/presentation/helpers/app_images.dart';
 
 class EmptyStateWidget extends StatelessWidget {

@@ -10,11 +10,12 @@ class HouseDescription extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Description',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
+            color: Theme.of(context).textTheme.titleLarge?.color,
           ),
         ),
         const SizedBox(height: 16),
@@ -22,7 +23,7 @@ class HouseDescription extends StatelessWidget {
           description,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[700],
+            color: Theme.of(context).textTheme.titleLarge?.color,
             height: 1.3,
             fontWeight: FontWeight.w300,
             letterSpacing: 0.5,
