@@ -13,7 +13,7 @@ class HouseDescription extends StatelessWidget {
         Text(
           'Description',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Theme.of(context).textTheme.titleLarge?.color,
           ),
@@ -22,7 +22,7 @@ class HouseDescription extends StatelessWidget {
         Text(
           description,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             color: Theme.of(context).textTheme.titleLarge?.color,
             height: 1.3,
             fontWeight: FontWeight.w300,

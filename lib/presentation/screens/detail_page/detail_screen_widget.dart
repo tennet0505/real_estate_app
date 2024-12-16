@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/constants.dart';
@@ -8,8 +7,44 @@ import 'package:real_estate_app/presentation/screens/detail_page/widgets/house_i
 import 'package:real_estate_app/presentation/screens/detail_page/widgets/house_location_map_widget.dart';
 import 'package:real_estate_app/presentation/screens/detail_page/widgets/house_price_info_widget.dart';
 
-class DetailScreen extends StatelessWidget {
+class DetailScreen extends StatefulWidget {
   const DetailScreen({super.key});
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderStateMixin{
+  bool isExpanded = false;
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      setState(() {
+        isExpanded = true;
+      });
+    });
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1100), // Animation duration
+      vsync: this, // Use this as TickerProvider from the mixin
+    )..forward(); // Automatically start the animation
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 3),  // Start position (just below the screen)
+      end: Offset.zero,           // End position (final position)
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut, // Smooth easing effect
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,23 +56,25 @@ class DetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
+              alignment: Alignment.bottomCenter,
               clipBehavior: Clip.none,
               children: [
                 HouseImageSection(
-                    imageUrl: '${Constants.mainUrl}${house.image}', id: house.id,),
-                Positioned(
-                  bottom: 0, // Align to bottom of the image
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondaryContainer,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(18),
-                        topRight: Radius.circular(18),
-                      ), // Rounded corners
-                    ),
+                  imageUrl: '${Constants.mainUrl}${house.image}',
+                  id: house.id,
+                ),
+                AnimatedContainer(
+                  duration: const Duration(
+                      milliseconds: 500), // Duration of the animation
+                  height: isExpanded
+                      ? 20
+                      : 0, // Height changes based on _isExpanded
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18),
+                    ), // Rounded corners
                   ),
                 ),
               ],
@@ -49,12 +86,15 @@ class DetailScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    HousePriceInfo(
-                      price: formatCurrency(house.price),
-                      bedrooms: house.bedrooms,
-                      bathrooms: house.bathrooms,
-                      size: house.size,
-                      distanceFromUser: house.distanceFromUser,
+                    SlideTransition(
+                      position: _slideAnimation,
+                      child: HousePriceInfo(
+                        price: formatCurrency(house.price),
+                        bedrooms: house.bedrooms,
+                        bathrooms: house.bathrooms,
+                        size: house.size,
+                        distanceFromUser: house.distanceFromUser,
+                      ),
                     ),
                     const SizedBox(height: 30),
                     HouseDescription(description: house.description),
@@ -62,7 +102,7 @@ class DetailScreen extends StatelessWidget {
                     Text(
                       'Location',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).textTheme.titleLarge?.color,
                       ),

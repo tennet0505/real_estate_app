@@ -27,7 +27,7 @@ class HousePriceInfo extends StatelessWidget {
         Text(
           price,
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Theme.of(context).textTheme.titleLarge?.color,
           ),

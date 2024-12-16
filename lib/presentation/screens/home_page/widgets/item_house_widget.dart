@@ -58,8 +58,8 @@ class ItemHouseWidget extends StatelessWidget {
               Text(
                 '${house.zip.replaceAll(' ', '')} ${house.city}',
                 style: TextStyle(
-                  fontSize: 10,
-                  height: 0.8,
+                  fontSize: 12,
+                  // height: 1,
                   color: AppColor.mediumColor,
                   fontWeight: FontWeight.w400,
                   letterSpacing: 0.1,

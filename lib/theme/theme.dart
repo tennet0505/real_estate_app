@@ -32,10 +32,10 @@ class ThemeDataStyle {
       primary: AppColor.backgroundColorDarkPrimary,
       secondary: AppColor.backgroundColorDarkSecondary,
       primaryContainer: AppColor.backgroundColorDarkPrimary,
-      secondaryContainer: AppColor.backgroundColorDarkPrimary,
+      secondaryContainer: AppColor.backgroundColorDarkSecondary,
     ),
-    scaffoldBackgroundColor: AppColor.backgroundColorDarkPrimary,
-    cardColor: AppColor.backgroundColorDarkSecondary,
+    scaffoldBackgroundColor: AppColor.backgroundColorDarkSecondary,
+    cardColor: AppColor.backgroundColorDarkPrimary,
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: AppColor.backgroundColorDarkPrimary,
       selectedItemColor: AppColor.backgroundColorSecondary,
@@ -46,6 +46,6 @@ class ThemeDataStyle {
       titleMedium: TextStyle(color: AppColor.backgroundColorDarkPrimary),
     ),
     appBarTheme:
-        AppBarTheme(backgroundColor: AppColor.backgroundColorDarkPrimary),
+        AppBarTheme(backgroundColor: AppColor.backgroundColorDarkSecondary),
   );
 }

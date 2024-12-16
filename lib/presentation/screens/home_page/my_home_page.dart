@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
               centerTitle: false,
               backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
               title: Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(left: 0.0),
                 child: Text(
                   'DTT REAL ESTATE',
                   style: TextStyle(

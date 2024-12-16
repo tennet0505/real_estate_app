@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 onRefresh: _onRefresh, // Refresh handler
                 child: state.houses.isEmpty
-                    ? const EmptyStateWidget()
+                    ? EmptyStateWidget(onRefresh: _onRefresh)
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 54),
                         itemCount: state.houses.length,
@@ -79,11 +79,11 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
             }
-            return const EmptyStateWidget();
+            return EmptyStateWidget(onRefresh: _onRefresh, showRefreshButton: true);
           },
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: SearchWidget(textEditingController: textEditingController),
         ),
       ],
