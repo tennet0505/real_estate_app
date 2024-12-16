@@ -8,7 +8,7 @@ class EmptyStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColor.lightGrayColor,
+      // colAppColor.lightGrayColor,
       child: Center(
           child: Padding(
         padding: const EdgeInsets.only(left: 54, right: 54, top: 24),

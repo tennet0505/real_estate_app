@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/screens/detail_page/detail_screen_widget.dart';
 import 'package:real_estate_app/presentation/screens/home_page/my_home_page.dart';
 import 'package:real_estate_app/theme/theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter(); // Initialize Hive
+  Hive.registerAdapter(HouseAdapter()); // Register the Hive adapter
   runApp(const MyApp());
 }
 

@@ -15,6 +15,7 @@ class SearchWidget extends StatelessWidget {
       height: 40,
       child: TextField(
         cursorColor: AppColor.mediumColor,
+        cursorHeight: 14,
         controller: textEditingController,
         decoration: InputDecoration(
           label: const Text(
@@ -26,6 +27,7 @@ class SearchWidget extends StatelessWidget {
               fontFamily: 'GothamSSm',
             ),
           ),
+          floatingLabelBehavior: FloatingLabelBehavior.never,
           filled: true,
           fillColor: AppColor.darkGrayColor,
           border: OutlineInputBorder(
@@ -40,6 +42,7 @@ class SearchWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide.none,
           ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
           suffixIcon: const Icon(
             Icons.search,
             color: AppColor.mediumColor,

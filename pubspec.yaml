@@ -42,12 +42,16 @@ dependencies:
   url_launcher: ^6.3.1
   intl: ^0.18.0
   connectivity_plus: ^6.1.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   json_serializable: ^6.9.0
   build_runner: ^2.4.13
+  hive_generator: ^2.0.1
   
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -84,6 +88,7 @@ flutter:
     - images/ic_location.png
     - images/search_state_empty.png
     - images/no_internet.png
+    - images/house_placeholder.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

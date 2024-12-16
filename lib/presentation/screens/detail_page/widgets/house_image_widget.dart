@@ -1,10 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/presentation/helpers/app_images.dart';
 
 class HouseImageSection extends StatelessWidget {
   final String imageUrl;
   final int id;
 
-  const HouseImageSection({super.key, required this.imageUrl, required this.id});
+  const HouseImageSection(
+      {super.key, required this.imageUrl, required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -12,12 +15,15 @@ class HouseImageSection extends StatelessWidget {
       children: [
         Hero(
           tag: 'tag_$id',
-          child: Image.network(
-            imageUrl,
-            width: double.infinity,
-            height: 248,
-            fit: BoxFit.cover,
-          ),
+          child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Image.asset(
+                    height: 250,
+                    AppImages.housePlaceholder,
+                    fit: BoxFit.cover,
+                  ),
+              fit: BoxFit.cover),
         ),
         Positioned(
           top: 48,

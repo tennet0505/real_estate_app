@@ -20,24 +20,29 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       emit(const HouseLoadingState());
 
       final isConnected = await _isConnected();
-      if (!isConnected) {
-        emit(const HouseErrorState('No internet connection'));
-        return;
-      }
 
       try {
-        final houses = await repository.getHouses();
-        final housesWithDistances = await calculateDistances(houses);
+        if (!isConnected) {
+          emit(const HouseErrorState('No internet connection'));
+          final houses = await repository.getHousesFromDB();
+          final housesWithDistances = await calculateDistances(houses);
+          _allHouses.clear();
+          _allHouses.addAll(housesWithDistances);
 
-        _allHouses.clear();
-        _allHouses.addAll(housesWithDistances);
+          emit(HouseState(houses: housesWithDistances));
+        } else {
+          final houses = await repository.getHouses();
+          final housesWithDistances = await calculateDistances(houses);
 
-        emit(HouseState(houses: housesWithDistances));
+          _allHouses.clear();
+          _allHouses.addAll(housesWithDistances);
+
+          emit(HouseState(houses: housesWithDistances));
+        }
       } catch (e) {
         emit(HouseErrorState('Something went wrong. Please try again later.'));
       }
     });
-
 
     on<SearchHouses>((event, emit) {
       final query = event.query.toLowerCase();
@@ -67,17 +72,16 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
           house.latitude,
           house.longitude,
         );
-        house.distanceFromUser = distance;  
+        house.distanceFromUser = distance;
         return house;
       }).toList();
       return _houses;
     } catch (e) {
       print('Error calculating distances: $e');
-      return houses; 
+      return houses;
     }
   }
 
-  
   Future<bool> _isConnected() async {
     final connectivityResult = await Connectivity().checkConnectivity();
 

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/constants.dart';
 import 'package:real_estate_app/data/models/house.dart';
@@ -22,10 +23,17 @@ class ItemHouseWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.0),
         child: Hero(
           tag: 'tag_${house.id}',
-          child: Image.network(
-            '${Constants.mainUrl}${house.image}',
+          child: CachedNetworkImage(
             width: 74,
             height: 74,
+            imageUrl: '${Constants.mainUrl}${house.image}',
+            placeholder: (context, url) => CircularProgressIndicator(),
+            errorWidget: (context, url, error) => Image.asset(
+              width: 74,
+              height: 74,
+              AppImages.housePlaceholder,
+              fit: BoxFit.cover,
+            ),
             fit: BoxFit.cover,
           ),
         ),
