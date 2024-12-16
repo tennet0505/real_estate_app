@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/presentation/helpers/app_color.dart';
-import 'package:real_estate_app/presentation/main_page/detail_screen_widget.dart';
-import 'package:real_estate_app/presentation/main_screen.dart';
+import 'package:real_estate_app/presentation/screens/detail_page/detail_screen_widget.dart';
+import 'package:real_estate_app/presentation/screens/home_page/my_home_page.dart';
 
 void main() {
   runApp(const MyApp());

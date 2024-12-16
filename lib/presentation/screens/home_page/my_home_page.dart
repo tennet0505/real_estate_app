@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/presentation/helpers/app_color.dart';
-import 'package:real_estate_app/presentation/about_page.dart';
-import 'package:real_estate_app/presentation/main_page/main_page.dart';
+import 'package:real_estate_app/presentation/widgets/about_page.dart';
+import 'package:real_estate_app/presentation/screens/home_page/home_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: IndexedStack(index: _selectedIndex, children: [
         BlocProvider(
             create: (context) => HouseBloc(HouseRepository()),
-            child: const MainPage()),
+            child: const HomePage()),
         const AboutWidget(),
       ]),
       bottomNavigationBar: Container(

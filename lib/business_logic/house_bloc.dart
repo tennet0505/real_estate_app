@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:real_estate_app/data/clients/geo_client.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/data/models/house.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 part 'house_event.dart';
 part 'house_state.dart';
@@ -15,19 +18,26 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
   HouseBloc(this.repository) : super(const HouseLoadingState()) {
     on<GetHouses>((event, emit) async {
       emit(const HouseLoadingState());
+
+      final isConnected = await _isConnected();
+      if (!isConnected) {
+        emit(const HouseErrorState('No internet connection'));
+        return;
+      }
+
       try {
         final houses = await repository.getHouses();
-        
         final housesWithDistances = await calculateDistances(houses);
 
         _allHouses.clear();
         _allHouses.addAll(housesWithDistances);
-        
+
         emit(HouseState(houses: housesWithDistances));
       } catch (e) {
-        emit(HouseErrorState(e.toString()));
+        emit(HouseErrorState('Something went wrong. Please try again later.'));
       }
     });
+
 
     on<SearchHouses>((event, emit) {
       final query = event.query.toLowerCase();
@@ -65,5 +75,26 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       print('Error calculating distances: $e');
       return houses; 
     }
+  }
+
+  
+  Future<bool> _isConnected() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult == ConnectivityResult.none) {
+      return false; // No connection at all.
+    }
+
+    // Perform an actual internet check (ping).
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true; // Internet connection is active.
+      }
+    } on SocketException catch (_) {
+      return false; // Internet is not reachable.
+    }
+
+    return false;
   }
 }

@@ -12,4 +12,5 @@ abstract class AppImages {
   static const arrow = 'images/ic_arrow.png';
   static const location = 'images/ic_location.png';
   static const emptyState = 'images/search_state_empty.png';
+  static const noInternetState = 'images/no_internet.png';
 }
