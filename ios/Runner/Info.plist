@@ -53,6 +53,8 @@
 	<string>We need your location to show directions.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+	<string>http</string>
+    <string>https</string>
   	<string>googlemaps</string>
   	<string>maps</string>
 	</array>

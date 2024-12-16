@@ -65,7 +65,7 @@ class _MainPageState extends State<MainPage> {
                                       borderRadius: BorderRadius.circular(8),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
+                                          color: Colors.black.withValues(alpha: 0.1),
                                           offset: const Offset(0, 2),
                                           blurRadius: 5,
                                         ),
@@ -130,11 +130,15 @@ class ItemHouseWidget extends StatelessWidget {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
-        child: Image.network(
-          '${Constants.mainUrl}${house.image}',
-          width: 74,
-          height: 74,
-          fit: BoxFit.cover,
+        child: 
+        Hero(
+          tag: 'tag_${house.id}',
+          child: Image.network(
+            '${Constants.mainUrl}${house.image}',
+            width: 74,
+            height: 74,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
       const SizedBox(width: 16),

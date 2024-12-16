@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/constants.dart';
 import 'package:real_estate_app/presentation/helpers/app_color.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutWidget extends StatelessWidget {
   const AboutWidget({super.key});
 
-  Future<void> _launchURL() async {
-    final url = Uri.parse('https://www.d-tt.nl');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       throw 'Could not launch $url';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColor.lightGrayColor,
+    return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 70, 24, 24),
         child: Column(
@@ -69,7 +67,7 @@ class AboutWidget extends StatelessWidget {
                     const Text('by DTT'),
                     InkWell(
                       onTap: () async {
-                        _launchURL;
+                        _launchURL(Constants.webSiteUrl);
                       },
                       child: const Text(
                         'd-tt.nl',

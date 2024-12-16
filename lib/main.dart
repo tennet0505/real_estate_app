@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'DTT REAL ESTATE',
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: AppColor.lightGrayColor),
+          scaffoldBackgroundColor: AppColor.lightGrayColor,
           bottomNavigationBarTheme: const BottomNavigationBarThemeData(
             backgroundColor: AppColor.whiteColor,
             selectedItemColor: AppColor.strongColor,

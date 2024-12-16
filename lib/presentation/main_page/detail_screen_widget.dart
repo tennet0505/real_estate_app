@@ -27,7 +27,7 @@ class DetailScreen extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 HouseImageSection(
-                    imageUrl: '${Constants.mainUrl}${house.image}'),
+                    imageUrl: '${Constants.mainUrl}${house.image}', id: house.id,),
                 Positioned(
                   bottom: 0, // Align to bottom of the image
                   left: 0,
@@ -87,18 +87,22 @@ class DetailScreen extends StatelessWidget {
 
 class HouseImageSection extends StatelessWidget {
   final String imageUrl;
+  final int id;
 
-  const HouseImageSection({super.key, required this.imageUrl});
+  const HouseImageSection({super.key, required this.imageUrl, required this.id});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Image.network(
-          imageUrl,
-          width: double.infinity,
-          height: 248,
-          fit: BoxFit.cover,
+        Hero(
+          tag: 'tag_$id',
+          child: Image.network(
+            imageUrl,
+            width: double.infinity,
+            height: 248,
+            fit: BoxFit.cover,
+          ),
         ),
         Positioned(
           top: 48,
@@ -146,11 +150,17 @@ class HousePriceInfo extends StatelessWidget {
         Row(
           children: [
             IconWidget(
-                imageString: AppImages.bed, string: '$bedrooms', isDetailScreen: true),
+                imageString: AppImages.bed,
+                string: '$bedrooms',
+                isDetailScreen: true),
             IconWidget(
-                imageString: AppImages.shower, string: '$bathrooms', isDetailScreen: true),
+                imageString: AppImages.shower,
+                string: '$bathrooms',
+                isDetailScreen: true),
             IconWidget(
-                imageString: AppImages.mapLayer, string: '$size', isDetailScreen: true),
+                imageString: AppImages.mapLayer,
+                string: '$size',
+                isDetailScreen: true),
             IconWidget(
                 imageString: AppImages.location,
                 string: formatDistance(distanceFromUser),
