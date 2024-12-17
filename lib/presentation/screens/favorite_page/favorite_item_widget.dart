@@ -93,6 +93,7 @@ class _FavoriteItemHouseWidgetState extends State<FavoriteItemHouseWidget> {
                   ),
                   Spacer(),
                   Column(
+                    spacing: 4,
                     children: [
                       FavoriteIconWidget(
                         imageString: AppImages.bed,

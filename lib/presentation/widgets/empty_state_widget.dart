@@ -4,10 +4,13 @@ import 'package:real_estate_app/presentation/helpers/app_images.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   final bool showRefreshButton;
+  final bool isFavorite;
   final Future<void> Function()
       onRefresh; // Define a callback function for refresh action
 
-  const EmptyStateWidget({super.key, required this.onRefresh, this.showRefreshButton = false});
+  const EmptyStateWidget({super.key, required this.onRefresh, 
+  this.showRefreshButton = false, 
+  this.isFavorite = false});
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +25,13 @@ class EmptyStateWidget extends StatelessWidget {
           children: [
             Image.asset(AppImages.emptyState),
             const SizedBox(height: 48),
-            const Text(
-              'No results found',
-              style: TextStyle(fontSize: 16, color: AppColor.mediumColor),
+            Text(
+              isFavorite ? 'Wishlist is empty' : 'No results found',
+              style: TextStyle(fontSize: 20, color: AppColor.mediumColor),
             ),
-            const Text(
-              'Perhaps try another search?',
-              style: TextStyle(fontSize: 16, color: AppColor.mediumColor),
+            Text(
+               isFavorite ? '' : 'Perhaps try another search?',
+              style: TextStyle(fontSize: 20, color: AppColor.mediumColor),
             ),
             const SizedBox(height: 24),
             if (showRefreshButton)

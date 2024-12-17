@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
 import 'package:real_estate_app/presentation/screens/favorite_page/favorite_list_widget.dart';
+import 'package:real_estate_app/presentation/widgets/empty_state_widget.dart';
 import 'package:real_estate_app/theme/app_color.dart';
 
 class FavoritePage extends StatefulWidget {
@@ -15,11 +16,15 @@ class _FavoritePageState extends State<FavoritePage> {
   @override
   void initState() {
     super.initState();
-    context.read<HouseBloc>().add(const GetFavoriteHouses());
+    _onRefresh();
   }
 
   void removeHouse(int houseId) {
     context.read<HouseBloc>().add(ToggleFavoriteHouseEvent(houseId));
+  }
+
+  Future<void> _onRefresh() async {
+    context.read<HouseBloc>().add(const GetFavoriteHouses());
   }
 
   @override
@@ -39,26 +44,29 @@ class _FavoritePageState extends State<FavoritePage> {
             ),
           );
         } else if (state is HouseState) {
-          return ListView.builder(
-            itemCount: state.favoriteHouses.length,
-            itemExtent: 220,
-            itemBuilder: (context, index) {
-              final house = state.favoriteHouses[index];
-              return FavoriteListWidget(
-                house: house,
-                onDelete: () {
-                  removeHouse(house.id);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("${house.zip} removed from favorites"), 
-                      backgroundColor:Colors.red),
-                  );
-                },
-              );
-            },
-          );
+          return state.favoriteHouses.isEmpty
+              ? EmptyStateWidget(onRefresh: _onRefresh, isFavorite: true,)
+              : ListView.builder(
+                  itemCount: state.favoriteHouses.length,
+                  itemExtent: 220,
+                  itemBuilder: (context, index) {
+                    final house = state.favoriteHouses[index];
+                    return FavoriteListWidget(
+                      house: house,
+                      onDelete: () {
+                        removeHouse(house.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text("${house.zip} removed from favorites"),
+                              backgroundColor: Colors.red),
+                        );
+                      },
+                    );
+                  },
+                );
         } else {
-          return Text("data");
+          return EmptyStateWidget(onRefresh: _onRefresh);
         }
       },
     );

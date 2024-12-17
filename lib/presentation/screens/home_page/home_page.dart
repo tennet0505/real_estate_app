@@ -67,7 +67,10 @@ class _HomePageState extends State<HomePage> {
                       ),
               );
             } else {
-              return Text("data");
+              return EmptyStateWidget(
+                onRefresh: _onRefresh,
+                showRefreshButton: true,
+              );
             }
           },
         ),

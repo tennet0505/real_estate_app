@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
               title: Padding(
                 padding: const EdgeInsets.only(left: 0.0),
                 child: Text(
-                  _selectedIndex == 2 ? 'MY FAVORITE' : 'DTT REAL ESTATE',
+                  _selectedIndex == 2 ? 'MY WISHLIST' : 'DTT REAL ESTATE',
                   style: TextStyle(
                     fontSize: 18,
                     fontFamily: 'GothamSSm',
