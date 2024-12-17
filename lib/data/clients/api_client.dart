@@ -33,7 +33,7 @@ class ApiClient {
       if (json is! List<dynamic>) {
         throw FormatException('Invalid JSON format');
       }
-      return json as List<dynamic>;
+      return json;
     } catch (e) {
       throw FormatException('Error parsing JSON: $e');
     }

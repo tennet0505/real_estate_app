@@ -103,7 +103,6 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       final housesWithDistances = await calculateDistances(houses);
       return housesWithDistances;
     } catch (e) {
-      print('Error fetching favorite houses: $e');
       return [];
     }
   }
@@ -120,15 +119,12 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
 
       return favoriteHouses;
     } catch (e) {
-      print('Error fetching favorite houses: $e');
       return [];
     }
   }
 
   Set<int> _getFavoriteIds() {
     final favoriteIds = prefs.getStringList('favoriteHouseIds') ?? [];
-    print(favoriteIds.length);
-    print(favoriteIds.map((id) => int.parse(id)).toSet());
     return favoriteIds.map((id) => int.parse(id)).toSet();
   }
 
@@ -138,7 +134,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       final userLat = position.latitude;
       final userLon = position.longitude;
 
-      final _houses = houses.map((house) {
+      final housesUpdated = houses.map((house) {
         final distance = geoClient.calculateDistance(
           userLat,
           userLon,
@@ -148,9 +144,8 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
         house.distanceFromUser = distance;
         return house;
       }).toList();
-      return _houses;
+      return housesUpdated;
     } catch (e) {
-      print('Error calculating distances: $e');
       return houses;
     }
   }

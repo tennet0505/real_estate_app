@@ -52,11 +52,8 @@ class _DetailScreenState extends State<DetailScreen>
   @override
   Widget build(BuildContext context) {
     final house = ModalRoute.of(context)?.settings.arguments as House;
-    print(house.id);
     return Scaffold(
       body: BlocBuilder<HouseBloc, HouseState>(builder: (context, state) {
-        print(state);
-
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

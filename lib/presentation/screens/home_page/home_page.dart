@@ -35,7 +35,6 @@ class _HomePageState extends State<HomePage> {
       children: [
         BlocBuilder<HouseBloc, HouseState>(
           builder: (context, state) {
-            print(state);
             if (state is HouseLoadingState) {
               return const Center(
                   child: CircularProgressIndicator(
