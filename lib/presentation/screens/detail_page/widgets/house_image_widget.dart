@@ -12,7 +12,7 @@ class HouseImageSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
+      children: [ 
         Hero(
           tag: 'tag_$id',
           child: CachedNetworkImage(

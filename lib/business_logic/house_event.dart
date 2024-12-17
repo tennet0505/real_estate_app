@@ -12,3 +12,12 @@ class SearchHouses extends HouseEvent {
   final String query;
   const SearchHouses(this.query);
 }
+
+class GetFavoriteHouses extends HouseEvent {
+  const GetFavoriteHouses();
+}
+
+class ToggleFavoriteHouseEvent extends HouseEvent {
+  final int houseId;
+  ToggleFavoriteHouseEvent(this.houseId);
+}

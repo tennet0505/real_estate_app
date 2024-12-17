@@ -14,4 +14,5 @@ abstract class AppImages {
   static const emptyState = 'images/search_state_empty.png';
   static const noInternetState = 'images/no_internet.png';
   static const housePlaceholder = 'images/house_placeholder.png';
+  static const favorite = 'images/ic_favorite.png';
 }

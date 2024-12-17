@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/constants.dart';
 import 'package:real_estate_app/presentation/helpers/currency_formater.dart';
@@ -14,7 +16,8 @@ class DetailScreen extends StatefulWidget {
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
-class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderStateMixin{
+class _DetailScreenState extends State<DetailScreen>
+    with SingleTickerProviderStateMixin {
   bool isExpanded = false;
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
@@ -28,12 +31,12 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
     });
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1100), // Animation duration
-      vsync: this, // Use this as TickerProvider from the mixin
-    )..forward(); // Automatically start the animation
+      vsync: this,
+    )..forward();
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 3),  // Start position (just below the screen)
-      end: Offset.zero,           // End position (final position)
+      begin: const Offset(0, 3), // Start position (just below the screen)
+      end: Offset.zero, // End position (final position)
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOut, // Smooth easing effect
@@ -49,76 +52,83 @@ class _DetailScreenState extends State<DetailScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final house = ModalRoute.of(context)?.settings.arguments as House;
-
+    print(house.id);
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              alignment: Alignment.bottomCenter,
-              clipBehavior: Clip.none,
-              children: [
-                HouseImageSection(
-                  imageUrl: '${Constants.mainUrl}${house.image}',
-                  id: house.id,
-                ),
-                AnimatedContainer(
-                  duration: const Duration(
-                      milliseconds: 500), // Duration of the animation
-                  height: isExpanded
-                      ? 20
-                      : 0, // Height changes based on _isExpanded
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(18),
-                      topRight: Radius.circular(18),
-                    ), // Rounded corners
+      body: BlocBuilder<HouseBloc, HouseState>(builder: (context, state) {
+        print(state);
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                alignment: Alignment.bottomCenter,
+                clipBehavior: Clip.none,
+                children: [
+                  HouseImageSection(
+                    imageUrl: '${Constants.mainUrl}${house.image}',
+                    id: house.id,
+                  ),
+                  AnimatedContainer(
+                    duration: const Duration(
+                        milliseconds: 500), // Duration of the animation
+                    height: isExpanded
+                        ? 20
+                        : 0, // Height changes based on _isExpanded
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(18),
+                      ), // Rounded corners
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SlideTransition(
+                        position: _slideAnimation,
+                        child: HousePriceInfo(
+                          price: formatCurrency(house.price),
+                          bedrooms: house.bedrooms,
+                          bathrooms: house.bathrooms,
+                          size: house.size,
+                          distanceFromUser: house.distanceFromUser,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      HouseDescription(
+                        house: house,
+                        isFavorite: state.favoriteHouseIds.contains(house.id),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Location',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.titleLarge?.color,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      HouseLocationMap(
+                        latitude: house.latitude,
+                        longitude: house.longitude,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            Container(
-              color: Theme.of(context).colorScheme.secondaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: HousePriceInfo(
-                        price: formatCurrency(house.price),
-                        bedrooms: house.bedrooms,
-                        bathrooms: house.bathrooms,
-                        size: house.size,
-                        distanceFromUser: house.distanceFromUser,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    HouseDescription(description: house.description),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Location',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).textTheme.titleLarge?.color,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    HouseLocationMap(
-                      latitude: house.latitude,
-                      longitude: house.longitude,
-                    ),
-                  ],
-                ),
               ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

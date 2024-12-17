@@ -2,13 +2,28 @@ part of 'house_bloc.dart';
 
 class HouseState extends Equatable {
   final List<House> houses;
-  const HouseState({this.houses = const []});
+  final List<House> favoriteHouses;
+  final Set<int> favoriteHouseIds; // Track favorite house IDs
+
+  const HouseState({
+    this.houses = const [],
+    this.favoriteHouses = const [],
+    this.favoriteHouseIds = const {},
+  });
 
   @override
-  List<Object?> get props => [houses];
+  List<Object?> get props => [houses, favoriteHouses, favoriteHouseIds];
 
-  HouseState copyWith({List<House>? houses}) {
-    return HouseState(houses: houses ?? this.houses);
+  HouseState copyWith({
+    List<House>? houses,
+    List<House>? favoriteHouses,
+    Set<int>? favoriteHouseIds,
+  }) {
+    return HouseState(
+      houses: houses ?? this.houses,
+      favoriteHouses: favoriteHouses ?? this.favoriteHouses,
+      favoriteHouseIds: favoriteHouseIds ?? this.favoriteHouseIds,
+    );
   }
 }
 
@@ -20,4 +35,3 @@ class HouseErrorState extends HouseState {
   final String message;
   const HouseErrorState(this.message);
 }
-
