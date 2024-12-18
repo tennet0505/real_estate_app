@@ -22,6 +22,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     context.read<HouseBloc>().add(const GetHouses());
+     final searchQuery = context.read<HouseBloc>().searchQuery;
+    textEditingController.text = searchQuery; 
+    
     textEditingController.addListener(() {
       context.read<HouseBloc>().add(SearchHouses(textEditingController.text));
     });

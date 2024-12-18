@@ -18,183 +18,152 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
   final List<House> _allHouses = [];
   final GeoClient geoClient = GeoClient();
   final SharedPreferences prefs;
+  String searchQuery = '';
 
   HouseBloc(this.repository, this.prefs) : super(const HouseLoadingState()) {
-    on<GetHouses>((event, emit) async {
-      emit(const HouseLoadingState());
-
-      final isConnected = await _isConnected();
-      final houses = await _getHouses();
-      if (!isConnected) {
-        emit(HouseErrorState(AppLocal.noInternetConnection.tr()));
-      } 
-      emit(HouseState(houses: houses,
-      favoriteHouseIds: _getFavoriteIds(),
-      errorMessage: (!isConnected) ? AppLocal.noInternetConnection.tr() : '' ));
-    });
-
-    on<SearchHouses>((event, emit) {
-      final query = event.query.toLowerCase();
-      if (query.isEmpty) {
-        emit(HouseState(houses: _allHouses));
-      } else {
-        final filteredHouses = _allHouses.where((house) {
-          final zip = house.zip.toLowerCase();
-          final city = house.city.toLowerCase();
-          return zip.contains(query) || city.contains(query);
-        }).toList();
-        if (filteredHouses.isEmpty) {
-          emit(HouseErrorState(
-              AppLocal.noResultsFound.tr()));
-        } else {
-          emit(HouseState(houses: filteredHouses));
-        }
-      }
-    });
-
-    on<ToggleFavoriteHouseEvent>((event, emit) async {
-      final updatedFavoriteIds = Set<int>.from(state.favoriteHouseIds);
-
-      if (updatedFavoriteIds.contains(event.houseId)) {
-        // Remove from favorites
-        updatedFavoriteIds.remove(event.houseId);
-      } else {
-        // Add to favorites
-        updatedFavoriteIds.add(event.houseId);
-      }
-
-      // Persist the favorite house IDs in SharedPreferences
-      await prefs.setStringList(
-        'favoriteHouseIds',
-        updatedFavoriteIds.map((id) => id.toString()).toList(),
-      );
-      final favoriteHouses = await _getFavoriteHouses();
-      final houses = await _getHouses();
-      if (favoriteHouses.isEmpty) {
-        emit(HouseErrorState(AppLocal.wishlistIsEmpty.tr()));
-      } else {
-        emit(HouseState(
-          houses: houses,
-          favoriteHouses: favoriteHouses,
-          favoriteHouseIds: updatedFavoriteIds,
-        ));
-      }
-    });
-
-    on<GetFavoriteHouses>((event, emit) async {
-      emit(HouseLoadingState());
-      try {
-        final favoriteHouses = await _getFavoriteHouses();
-        if (favoriteHouses.isEmpty) {
-          emit(HouseErrorState(AppLocal.wishlistIsEmpty.tr()));
-        } else {
-          emit(HouseState(
-              favoriteHouses: favoriteHouses,
-              favoriteHouseIds: _getFavoriteIds()));
-        }
-      } catch (e) {
-        emit(HouseErrorState(AppLocal.somethingWentWrongPleaseAgain.tr()));
-      }
-    });
+    on<GetHouses>(_handleGetHouses);
+    on<SearchHouses>(_handleSearchHouses);
+    on<ToggleFavoriteHouseEvent>(_handleToggleFavorite);
+    on<GetFavoriteHouses>(_handleGetFavoriteHouses);
   }
 
-  /// Fetches the list of houses from either the online repository or the local database,
-  /// based on the connectivity status. Updates the list with calculated distances.
-  Future<List<House>> _getHouses() async {
+  Future<void> _handleGetHouses(
+      GetHouses event, Emitter<HouseState> emit) async {
+    emit(const HouseLoadingState());
+
     final isConnected = await _isConnected();
-    try {
-      if (!isConnected) {
-        // Fetch houses from the local database if offline.
-        final houses = await _getHousesFromDB();
-        final housesWithDistances = await calculateDistances(houses);
-        _allHouses.clear();
-        _allHouses.addAll(houses); // Cache the fetched houses.
-        return housesWithDistances;
-      } else {
-        // Fetch houses from the online repository if online.
-        final houses = await repository.getHouses();
-        final housesWithDistances = await calculateDistances(houses);
-        _allHouses.clear();
-        _allHouses.addAll(houses); // Cache the fetched houses.
-        return housesWithDistances;
-      }
-    } catch (e) {
-      return []; 
+    final houses = await _fetchAndCacheHouses();
+
+    emit(HouseState(
+      houses: houses,
+      favoriteHouseIds: _getFavoriteIds(),
+      errorMessage: !isConnected ? AppLocal.noInternetConnection.tr() : '',
+    ));
+  }
+
+  void _handleSearchHouses(SearchHouses event, Emitter<HouseState> emit) {
+    searchQuery = event.query.trim().toLowerCase();
+
+    final filteredHouses = _allHouses.where((house) {
+      return house.zip.toLowerCase().contains(searchQuery) ||
+          house.city.toLowerCase().contains(searchQuery);
+    }).toList();
+
+    if (filteredHouses.isEmpty) {
+      emit(HouseErrorState(AppLocal.noResultsFound.tr()));
+    } else {
+      emit(HouseState(
+          houses: filteredHouses, favoriteHouseIds: _getFavoriteIds()));
     }
   }
 
-  /// Fetches the list of favorite houses based on the IDs stored in SharedPreferences.
-  Future<List<House>> _getFavoriteHouses() async {
-    final houses = await _getHouses(); 
-    final housesWithDistances = await calculateDistances(houses);
-    final favoriteIds = _getFavoriteIds(); 
-    // Filter houses by favorite IDs.
-    final favoriteHouses = housesWithDistances
-        .where((house) => favoriteIds.contains(house.id))
-        .toList();
-    return favoriteHouses;
+  Future<void> _handleToggleFavorite(
+      ToggleFavoriteHouseEvent event, Emitter<HouseState> emit) async {
+    final updatedFavoriteIds = Set<int>.from(state.favoriteHouseIds);
+
+    // Toggle favorite state
+    if (updatedFavoriteIds.contains(event.houseId)) {
+      updatedFavoriteIds.remove(event.houseId);
+    } else {
+      updatedFavoriteIds.add(event.houseId);
+    }
+
+    // Persist favorite IDs
+    await prefs.setStringList(
+      'favoriteHouseIds',
+      updatedFavoriteIds.map((id) => id.toString()).toList(),
+    );
+
+    final favoriteHouses = await _getFavoriteHouses();
+
+    List<House> filteredHouses = _allHouses;
+    if (searchQuery.isNotEmpty) {
+      filteredHouses = filteredHouses.where((house) {
+        return house.zip.toLowerCase().contains(searchQuery) ||
+            house.city.toLowerCase().contains(searchQuery);
+      }).toList();
+    }
+
+    emit(HouseState(
+      houses: filteredHouses,
+      favoriteHouses: favoriteHouses,
+      favoriteHouseIds: updatedFavoriteIds,
+    ));
   }
 
-  /// Fetches the list of houses from the local database.
-  Future<List<House>> _getHousesFromDB() async {
+  Future<void> _handleGetFavoriteHouses(
+      GetFavoriteHouses event, Emitter<HouseState> emit) async {
+    emit(HouseLoadingState());
+
+    final favoriteHouses = await _getFavoriteHouses();
+
+    if (favoriteHouses.isEmpty) {
+      emit(HouseErrorState(AppLocal.wishlistIsEmpty.tr()));
+    } else {
+      emit(HouseState(
+        favoriteHouses: favoriteHouses,
+        favoriteHouseIds: _getFavoriteIds(),
+      ));
+    }
+  }
+
+  Future<List<House>> _fetchAndCacheHouses() async {
     try {
-      final houses = await repository.getHousesFromDB();
-      final housesWithDistances = await calculateDistances(houses);
+      final isConnected = await _isConnected();
+      final houses = isConnected
+          ? await repository.getHouses()
+          : await repository.getHousesFromDB();
+
+      final housesWithDistances = await _calculateDistances(houses);
+      _allHouses
+        ..clear()
+        ..addAll(housesWithDistances);
+
       return housesWithDistances;
-    } catch (e) {
-      return []; 
+    } catch (_) {
+      return [];
     }
   }
 
-  /// Retrieves the set of favorite house IDs from SharedPreferences.
+  Future<List<House>> _getFavoriteHouses() async {
+    final favoriteIds = _getFavoriteIds();
+    return _allHouses.where((house) => favoriteIds.contains(house.id)).toList();
+  }
+
   Set<int> _getFavoriteIds() {
     final favoriteIds = prefs.getStringList('favoriteHouseIds') ?? [];
-    return favoriteIds.map((id) => int.parse(id)).toSet();
+    return favoriteIds.map(int.parse).toSet();
   }
 
-  /// Calculates the distances from the user's current location to each house.
-  /// Updates the `distanceFromUser` property in each house.
-  Future<List<House>> calculateDistances(List<House> houses) async {
+  Future<List<House>> _calculateDistances(List<House> houses) async {
     try {
-      // Fetch the user's current location.
       final position = await geoClient.getCurrentLocation();
-      final userLat = position.latitude;
-      final userLon = position.longitude;
-
-      // Calculate distances for each house.
-      final housesUpdated = houses.map((house) {
-        final distance = geoClient.calculateDistance(
-          userLat,
-          userLon,
+      return houses.map((house) {
+        house.distanceFromUser = geoClient.calculateDistance(
+          position.latitude,
+          position.longitude,
           house.latitude,
           house.longitude,
         );
-        house.distanceFromUser = distance;
         return house;
       }).toList();
-      return housesUpdated;
-    } catch (e) {
+    } catch (_) {
       return houses;
     }
   }
 
-  /// Checks the connectivity status by using `Connectivity` and performs a network ping
-  /// to verify internet access.
   Future<bool> _isConnected() async {
     final connectivityResult = await Connectivity().checkConnectivity();
 
     if (connectivityResult == ConnectivityResult.none) {
-      return false; 
+      return false;
     }
-    // Perform an actual internet check (ping).
+
     try {
       final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        return true; // Internet connection is active.
-      }
-    } on SocketException catch (_) {
-      return false; // Internet is not reachable.
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException {
+      return false;
     }
-    return false; // Default to false if check fails.
   }
 }

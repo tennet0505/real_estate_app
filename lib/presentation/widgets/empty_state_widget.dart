@@ -33,7 +33,7 @@ class EmptyStateWidget extends StatelessWidget {
             const SizedBox(height: 48),
             Text(
               message,
-              style: TextStyle(fontSize: 18, color: AppColor.mediumColor),
+              style: TextStyle(fontSize: 16, color: AppColor.mediumColor),
             ),
             const SizedBox(height: 24),
             if (showRefreshButton)
