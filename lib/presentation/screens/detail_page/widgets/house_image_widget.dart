@@ -19,7 +19,7 @@ class HouseImageSection extends StatelessWidget {
               imageUrl: imageUrl,
               placeholder: (context, url) => CircularProgressIndicator(),
               errorWidget: (context, url, error) => Image.asset(
-                    height: 250,
+                    height: 270,
                     AppImages.housePlaceholder,
                     fit: BoxFit.cover,
                   ),

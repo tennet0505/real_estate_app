@@ -9,7 +9,7 @@ class EmptyStateWidget extends StatelessWidget {
   final bool isFavorite;
   final String message;
   final Future<void> Function()
-      onRefresh; // Define a callback function for refresh action
+      onRefresh; 
 
   const EmptyStateWidget(
       {super.key,
@@ -25,15 +25,15 @@ class EmptyStateWidget extends StatelessWidget {
         padding: const EdgeInsets.only(left: 54, right: 54, top: 24),
         child: Column(
           mainAxisAlignment:
-              MainAxisAlignment.center, // Centers items vertically
+              MainAxisAlignment.center, 
           crossAxisAlignment:
-              CrossAxisAlignment.center, // Centers items horizontally
+              CrossAxisAlignment.center,
           children: [
             Image.asset(AppImages.emptyState),
             const SizedBox(height: 48),
             Text(
               message,
-              style: TextStyle(fontSize: 20, color: AppColor.mediumColor),
+              style: TextStyle(fontSize: 18, color: AppColor.mediumColor),
             ),
             const SizedBox(height: 24),
             if (showRefreshButton)

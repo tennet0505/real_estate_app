@@ -37,7 +37,7 @@ class _DetailPageState extends State<DetailPage>
     )..forward();
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 3), // Start position (just below the screen)
+      begin: const Offset(0, 2), // Start position (just below the screen)
       end: Offset.zero, // End position (final position)
     ).animate(CurvedAnimation(
       parent: _animationController,

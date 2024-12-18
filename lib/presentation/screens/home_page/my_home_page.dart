@@ -2,9 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/screens/favorite_page/favorite_screen_widget.dart';
-import 'package:real_estate_app/presentation/widgets/about_page.dart';
 import 'package:real_estate_app/presentation/screens/home_page/home_page.dart';
-import 'package:real_estate_app/presentation/widgets/settings_page.dart';
+import 'package:real_estate_app/presentation/screens/settings_page/settings_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});

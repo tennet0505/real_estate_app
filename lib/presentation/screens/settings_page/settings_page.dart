@@ -16,7 +16,6 @@ class SettingsPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Language switch
             ListTile(
               title: Text(AppLocal.language.tr(),
                   style: TextStyle(
@@ -49,7 +48,6 @@ class SettingsPage extends StatelessWidget {
                 },
               ),
             ),
-            // Theme mode switch
             ListTile(
               title: context.read<ThemeProvider>().isDarkMode
                   ? Text(AppLocal.lightMode.tr(),

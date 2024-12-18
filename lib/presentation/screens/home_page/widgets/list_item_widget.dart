@@ -11,7 +11,6 @@ class ListItemWidget extends StatelessWidget {
     required this.house, 
     required this.state,
   });
-
   final House house;
 
   @override

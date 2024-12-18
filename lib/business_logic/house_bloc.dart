@@ -98,58 +98,70 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     });
   }
 
+  /// Fetches the list of houses from either the online repository or the local database,
+  /// based on the connectivity status. Updates the list with calculated distances.
   Future<List<House>> _getHouses() async {
     final isConnected = await _isConnected();
     try {
       if (!isConnected) {
+        // Fetch houses from the local database if offline.
         final houses = await _getHousesFromDB();
         final housesWithDistances = await calculateDistances(houses);
         _allHouses.clear();
-        _allHouses.addAll(houses);
+        _allHouses.addAll(houses); // Cache the fetched houses.
         return housesWithDistances;
       } else {
+        // Fetch houses from the online repository if online.
         final houses = await repository.getHouses();
         final housesWithDistances = await calculateDistances(houses);
         _allHouses.clear();
-        _allHouses.addAll(houses);
+        _allHouses.addAll(houses); // Cache the fetched houses.
         return housesWithDistances;
       }
     } catch (e) {
-      return [];
+      return []; 
     }
   }
 
+  /// Fetches the list of favorite houses based on the IDs stored in SharedPreferences.
   Future<List<House>> _getFavoriteHouses() async {
-    final houses = await _getHouses();
+    final houses = await _getHouses(); 
     final housesWithDistances = await calculateDistances(houses);
-    final favoriteIds = _getFavoriteIds();
+    final favoriteIds = _getFavoriteIds(); 
+    // Filter houses by favorite IDs.
     final favoriteHouses = housesWithDistances
         .where((house) => favoriteIds.contains(house.id))
         .toList();
     return favoriteHouses;
   }
 
+  /// Fetches the list of houses from the local database.
   Future<List<House>> _getHousesFromDB() async {
     try {
       final houses = await repository.getHousesFromDB();
       final housesWithDistances = await calculateDistances(houses);
       return housesWithDistances;
     } catch (e) {
-      return [];
+      return []; 
     }
   }
 
+  /// Retrieves the set of favorite house IDs from SharedPreferences.
   Set<int> _getFavoriteIds() {
     final favoriteIds = prefs.getStringList('favoriteHouseIds') ?? [];
     return favoriteIds.map((id) => int.parse(id)).toSet();
   }
 
+  /// Calculates the distances from the user's current location to each house.
+  /// Updates the `distanceFromUser` property in each house.
   Future<List<House>> calculateDistances(List<House> houses) async {
     try {
+      // Fetch the user's current location.
       final position = await geoClient.getCurrentLocation();
       final userLat = position.latitude;
       final userLon = position.longitude;
 
+      // Calculate distances for each house.
       final housesUpdated = houses.map((house) {
         final distance = geoClient.calculateDistance(
           userLat,
@@ -166,11 +178,13 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     }
   }
 
+  /// Checks the connectivity status by using `Connectivity` and performs a network ping
+  /// to verify internet access.
   Future<bool> _isConnected() async {
     final connectivityResult = await Connectivity().checkConnectivity();
 
     if (connectivityResult == ConnectivityResult.none) {
-      return false; // No connection at all.
+      return false; 
     }
     // Perform an actual internet check (ping).
     try {
@@ -181,6 +195,6 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     } on SocketException catch (_) {
       return false; // Internet is not reachable.
     }
-    return false;
+    return false; // Default to false if check fails.
   }
 }
