@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/constants.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
-import 'package:real_estate_app/theme/app_color.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatelessWidget {
@@ -41,7 +40,7 @@ class AboutPage extends StatelessWidget {
               AppLocal.aboutText.tr(),
               style: TextStyle(
                 color: Theme.of(context).textTheme.titleLarge?.color,
-                fontSize: 16,
+                fontSize: 14,
                 height: 1.1,
                 fontWeight: FontWeight.w300,
                 letterSpacing: 0.2,

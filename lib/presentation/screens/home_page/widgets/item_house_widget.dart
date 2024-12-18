@@ -23,12 +23,14 @@ class ItemHouseWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.0),
         child: Hero(
           tag: 'tag_${house.id}',
-          child: CachedNetworkImage(
+          child: 
+          CachedNetworkImage(
             width: 74,
             height: 74,
             imageUrl: '${Constants.mainUrl}${house.image}',
             placeholder: (context, url) => CircularProgressIndicator(),
-            errorWidget: (context, url, error) => Image.asset(
+            errorWidget: (context, url, error) => 
+            Image.asset(
               width: 74,
               height: 74,
               AppImages.housePlaceholder,

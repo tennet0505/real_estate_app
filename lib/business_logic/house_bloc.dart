@@ -15,28 +15,52 @@ part 'house_state.dart';
 
 class HouseBloc extends Bloc<HouseEvent, HouseState> {
   final HouseRepository repository;
-  final List<House> _allHouses = [];
   final GeoClient geoClient = GeoClient();
+  final List<House> _allHouses = [];
   final SharedPreferences prefs;
   String searchQuery = '';
+  Set<int> _favoriteIds = {}; // Cached favorite IDs
+  bool _isDataLoaded = false; // Flag to check if data is already loaded
 
   HouseBloc(this.repository, this.prefs) : super(const HouseLoadingState()) {
     on<GetHouses>(_handleGetHouses);
     on<SearchHouses>(_handleSearchHouses);
     on<ToggleFavoriteHouseEvent>(_handleToggleFavorite);
     on<GetFavoriteHouses>(_handleGetFavoriteHouses);
+    on<RefreshHouses>(_handleRefreshHouses); // Added event for pull-to-refresh
+  }
+
+  // Method to refresh the favoriteIds cache from SharedPreferences
+  Future<void> _refreshFavoriteIds() async {
+    final favoriteIds = prefs.getStringList('favoriteHouseIds') ?? [];
+    _favoriteIds = favoriteIds.map(int.parse).toSet();
   }
 
   Future<void> _handleGetHouses(
       GetHouses event, Emitter<HouseState> emit) async {
+    if (_isDataLoaded) {
+      // If data is already loaded, just return the existing houses
+      final houses = _allHouses;
+      emit(HouseState(
+        houses: houses,
+        favoriteHouseIds: _favoriteIds,
+      ));
+      return;
+    }
+
     emit(const HouseLoadingState());
 
     final isConnected = await _isConnected();
     final houses = await _fetchAndCacheHouses();
 
+    // Refresh favoriteIds once when houses are fetched
+    await _refreshFavoriteIds();
+
+    _isDataLoaded = true; // Set the flag to true after data is loaded
+
     emit(HouseState(
       houses: houses,
-      favoriteHouseIds: _getFavoriteIds(),
+      favoriteHouseIds: _favoriteIds,
       errorMessage: !isConnected ? AppLocal.noInternetConnection.tr() : '',
     ));
   }
@@ -53,25 +77,25 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       emit(HouseErrorState(AppLocal.noResultsFound.tr()));
     } else {
       emit(HouseState(
-          houses: filteredHouses, favoriteHouseIds: _getFavoriteIds()));
+        houses: filteredHouses,
+        favoriteHouseIds: _favoriteIds, // Use cached favorite IDs
+      ));
     }
   }
 
   Future<void> _handleToggleFavorite(
       ToggleFavoriteHouseEvent event, Emitter<HouseState> emit) async {
-    final updatedFavoriteIds = Set<int>.from(state.favoriteHouseIds);
-
     // Toggle favorite state
-    if (updatedFavoriteIds.contains(event.houseId)) {
-      updatedFavoriteIds.remove(event.houseId);
+    if (_favoriteIds.contains(event.houseId)) {
+      _favoriteIds.remove(event.houseId);
     } else {
-      updatedFavoriteIds.add(event.houseId);
+      _favoriteIds.add(event.houseId);
     }
 
     // Persist favorite IDs
     await prefs.setStringList(
       'favoriteHouseIds',
-      updatedFavoriteIds.map((id) => id.toString()).toList(),
+      _favoriteIds.map((id) => id.toString()).toList(),
     );
 
     final favoriteHouses = await _getFavoriteHouses();
@@ -84,11 +108,15 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       }).toList();
     }
 
-    emit(HouseState(
-      houses: filteredHouses,
-      favoriteHouses: favoriteHouses,
-      favoriteHouseIds: updatedFavoriteIds,
-    ));
+    if (favoriteHouses.isEmpty) {
+      emit(HouseErrorState(AppLocal.wishlistIsEmpty.tr()));
+    } else {
+      emit(HouseState(
+        houses: filteredHouses,
+        favoriteHouses: favoriteHouses,
+        favoriteHouseIds: _favoriteIds, // Use cached favorite IDs
+      ));
+    }
   }
 
   Future<void> _handleGetFavoriteHouses(
@@ -102,9 +130,26 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     } else {
       emit(HouseState(
         favoriteHouses: favoriteHouses,
-        favoriteHouseIds: _getFavoriteIds(),
+        favoriteHouseIds: _favoriteIds, // Use cached favorite IDs
       ));
     }
+  }
+
+  // Handle refresh event (pull-to-refresh)
+  Future<void> _handleRefreshHouses(
+      RefreshHouses event, Emitter<HouseState> emit) async {
+    emit(const HouseLoadingState());
+
+    _isDataLoaded = false; // Reset the flag so that fresh data will be loaded
+    final houses = await _fetchAndCacheHouses();
+
+    // Refresh favoriteIds once when houses are fetched
+    await _refreshFavoriteIds();
+
+    emit(HouseState(
+      houses: houses,
+      favoriteHouseIds: _favoriteIds,
+    ));
   }
 
   Future<List<House>> _fetchAndCacheHouses() async {
@@ -126,13 +171,9 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
   }
 
   Future<List<House>> _getFavoriteHouses() async {
-    final favoriteIds = _getFavoriteIds();
-    return _allHouses.where((house) => favoriteIds.contains(house.id)).toList();
-  }
-
-  Set<int> _getFavoriteIds() {
-    final favoriteIds = prefs.getStringList('favoriteHouseIds') ?? [];
-    return favoriteIds.map(int.parse).toSet();
+    return _allHouses
+        .where((house) => _favoriteIds.contains(house.id))
+        .toList();
   }
 
   Future<List<House>> _calculateDistances(List<House> houses) async {

@@ -21,3 +21,7 @@ class ToggleFavoriteHouseEvent extends HouseEvent {
   final int houseId;
   ToggleFavoriteHouseEvent(this.houseId);
 }
+
+class RefreshHouses extends HouseEvent {
+  const RefreshHouses();
+}
