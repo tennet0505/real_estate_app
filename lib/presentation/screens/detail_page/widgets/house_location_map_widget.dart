@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:real_estate_app/constants.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HouseLocationMap extends StatelessWidget {
@@ -19,8 +21,8 @@ class HouseLocationMap extends StatelessWidget {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Location services are disabled')),
-      );
+        SnackBar(content: (Text(AppLocal.locationServicesAreDisabled.tr())),
+      ));
       return;
     }
 
@@ -29,8 +31,8 @@ class HouseLocationMap extends StatelessWidget {
         permission == LocationPermission.deniedForever) {
       permission = await Geolocator.requestPermission();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Location permission denied')),
-      );
+        SnackBar(content: (Text(AppLocal.locationPermissionDenied.tr())),
+      ));
       return;
     }
 
@@ -47,7 +49,7 @@ class HouseLocationMap extends StatelessWidget {
             children: [
               ListTile(
                 leading: const Icon(Icons. map),
-                title: const Text('Open in Google Maps'),
+                title: Text(AppLocal.openInGoogleMaps.tr()),
                 onTap: () async {
                   Navigator.pop(context);
                   await _openMapGoogle(context, position);
@@ -56,7 +58,7 @@ class HouseLocationMap extends StatelessWidget {
               if (Platform.isIOS) ...[
                 ListTile(
                   leading: Icon(Icons.map),
-                  title: Text('Open in Apple Maps'),
+                  title: Text(AppLocal.openInAppleMaps.tr()),
                   onTap: () async {
                     Navigator.pop(context);
                     await _openAppleMap(context);
@@ -82,7 +84,7 @@ class HouseLocationMap extends StatelessWidget {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open Google Maps')),
+        SnackBar(content: Text(AppLocal.unableToOpenGoogleMaps.tr(),)),
       );
     }
   }
@@ -125,7 +127,7 @@ class HouseLocationMap extends StatelessWidget {
             errorBuilder: (context, error, stackTrace) {
               return Center(
                 child: Text(
-                  'Unable to load map',
+                  AppLocal.unableToLoadMap.tr(),
                   style: TextStyle(color: Colors.grey[700]),
                 ),
               );

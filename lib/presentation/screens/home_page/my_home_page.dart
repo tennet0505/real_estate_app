@@ -1,7 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/screens/favorite_page/favorite_screen_widget.dart';
 import 'package:real_estate_app/presentation/widgets/about_page.dart';
 import 'package:real_estate_app/presentation/screens/home_page/home_page.dart';
+import 'package:real_estate_app/presentation/widgets/settings_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -15,8 +18,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> pages = [
     HomePage(),
-    AboutWidget(),
     FavoritePage(),
+    SettingsPage()
   ];
   void _selectTab(int index) {
     if (_selectedIndex == index) return;
@@ -36,7 +39,9 @@ class _MyHomePageState extends State<MyHomePage> {
               title: Padding(
                 padding: const EdgeInsets.only(left: 0.0),
                 child: Text(
-                  _selectedIndex == 2 ? 'MY WISHLIST' : 'DTT REAL ESTATE',
+                  _selectedIndex == 2
+                      ? AppLocal.settings.tr()
+                      : AppLocal.companyTitle.tr(),
                   style: TextStyle(
                     fontSize: 18,
                     fontFamily: 'GothamSSm',
@@ -64,8 +69,8 @@ class _MyHomePageState extends State<MyHomePage> {
           currentIndex: _selectedIndex,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-            BottomNavigationBarItem(icon: Icon(Icons.info), label: ''),
             BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ''),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: ''),
           ],
           onTap: _selectTab,
         ),

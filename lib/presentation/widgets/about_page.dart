@@ -1,10 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/constants.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/theme/app_color.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AboutWidget extends StatelessWidget {
-  const AboutWidget({super.key});
+class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
 
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
@@ -15,25 +17,30 @@ class AboutWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 70, 24, 24),
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: false,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 4.0),
+          child: Text(
+            AppLocal.about.tr(),
+            style: TextStyle(
+              fontSize: 18,
+              fontFamily: 'GothamSSm',
+              color: Theme.of(context).textTheme.titleLarge?.color,
+            ),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(24, 16, 24, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'ABOUT',
+              AppLocal.aboutText.tr(),
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
                 color: Theme.of(context).textTheme.titleLarge?.color,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.',
-              style: TextStyle(
-                color: AppColor.mediumColor,
                 fontSize: 16,
                 height: 1.1,
                 fontWeight: FontWeight.w300,
@@ -45,7 +52,7 @@ class AboutWidget extends StatelessWidget {
               height: 30,
             ),
             Text(
-              'Design and Development',
+              AppLocal.designAndDevelopment.tr(),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -65,7 +72,7 @@ class AboutWidget extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      'by DTT',
+                      AppLocal.byDtt.tr(),
                       style: TextStyle(
                         color: Theme.of(context).textTheme.titleLarge?.color,
                       ),

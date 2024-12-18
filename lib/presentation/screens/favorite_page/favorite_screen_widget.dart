@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/screens/favorite_page/favorite_list_widget.dart';
 import 'package:real_estate_app/presentation/widgets/empty_state_widget.dart';
 import 'package:real_estate_app/theme/app_color.dart';
@@ -29,43 +31,62 @@ class _FavoritePageState extends State<FavoritePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HouseBloc, HouseState>(
-      builder: (context, state) {
-        if (state is HouseLoadingState) {
-          return const Center(
-              child: CircularProgressIndicator(
-            color: AppColor.redColor,
-          ));
-        } else if (state is HouseErrorState) {
-          return EmptyStateWidget(
-            onRefresh: _onRefresh,
-            isFavorite: true,
-            message: state.message,
-          );
-        } else if (state is HouseState) {
-          return ListView.builder(
-            itemCount: state.favoriteHouses.length,
-            itemExtent: 220,
-            itemBuilder: (context, index) {
-              final house = state.favoriteHouses[index];
-              return FavoriteListWidget(
-                house: house,
-                onDelete: () {
-                  removeHouse(house.id);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text("${house.zip} removed from the wishlist"),
-                        backgroundColor: Colors.red),
-                  );
-                },
-              );
-            },
-          );
-        } else {
-          return EmptyStateWidget(
-              onRefresh: _onRefresh, message: 'Something went wrong.');
-        }
-      },
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: false,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 4.0),
+          child: Text(
+            AppLocal.myWishlist.tr(),
+            style: TextStyle(
+              fontSize: 18,
+              fontFamily: 'GothamSSm',
+              color: Theme.of(context).textTheme.titleLarge?.color,
+            ),
+          ),
+        ),
+      ),
+      body: BlocBuilder<HouseBloc, HouseState>(
+        builder: (context, state) {
+          if (state is HouseLoadingState) {
+            return const Center(
+                child: CircularProgressIndicator(
+              color: AppColor.redColor,
+            ));
+          } else if (state is HouseErrorState) {
+            return EmptyStateWidget(
+              onRefresh: _onRefresh,
+              isFavorite: true,
+              message: state.message,
+            );
+          } else if (state is HouseState) {
+            return ListView.builder(
+              itemCount: state.favoriteHouses.length,
+              itemExtent: 220,
+              itemBuilder: (context, index) {
+                final house = state.favoriteHouses[index];
+                return FavoriteListWidget(
+                  house: house,
+                  onDelete: () {
+                    removeHouse(house.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              "${house.zip} ${AppLocal.removeFromList.tr()}"),
+                          backgroundColor: Colors.red),
+                    );
+                  },
+                );
+              },
+            );
+          } else {
+            return EmptyStateWidget(
+              onRefresh: _onRefresh,
+              message: AppLocal.somethingWentWrong.tr(),
+            );
+          }
+        },
+      ),
     );
   }
 }

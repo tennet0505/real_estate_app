@@ -1,22 +1,24 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/constants.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/helpers/currency_formater.dart';
 import 'package:real_estate_app/presentation/screens/detail_page/widgets/house_description_widget.dart';
 import 'package:real_estate_app/presentation/screens/detail_page/widgets/house_image_widget.dart';
 import 'package:real_estate_app/presentation/screens/detail_page/widgets/house_location_map_widget.dart';
 import 'package:real_estate_app/presentation/screens/detail_page/widgets/house_price_info_widget.dart';
 
-class DetailScreen extends StatefulWidget {
-  const DetailScreen({super.key});
+class DetailPage extends StatefulWidget {
+  const DetailPage({super.key});
 
   @override
-  State<DetailScreen> createState() => _DetailScreenState();
+  State<DetailPage> createState() => _DetailPageState();
 }
 
-class _DetailScreenState extends State<DetailScreen>
+class _DetailPageState extends State<DetailPage>
     with SingleTickerProviderStateMixin {
   bool isExpanded = false;
   late AnimationController _animationController;
@@ -106,7 +108,7 @@ class _DetailScreenState extends State<DetailScreen>
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Location',
+                        AppLocal.location.tr(),
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,

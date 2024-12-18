@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/theme/app_color.dart';
 import 'package:real_estate_app/presentation/screens/home_page/widgets/list_item_widget.dart';
 import 'package:real_estate_app/presentation/screens/home_page/widgets/search_widget.dart';
@@ -37,7 +39,7 @@ class _HomePageState extends State<HomePage> {
           listener: (context, state) {
             if (state is HouseState && state.errorMessage != '') {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('No internet connection.'),backgroundColor: Colors.red),
+                SnackBar(content: Text(AppLocal.noInternetConnection.tr(),),backgroundColor: Colors.red),
               );
             }
           },
@@ -75,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                 return EmptyStateWidget(
                   onRefresh: _onRefresh,
                   showRefreshButton: true,
-                  message: 'Something went wrong.\n Try to refresh.',
+                  message: AppLocal.somethingWentWrongTryRefresh.tr(),
                 );
               }
             },

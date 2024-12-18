@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
 import 'package:real_estate_app/data/models/house.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 
 class HouseDescription extends StatelessWidget {
   final House house; // Add a houseId to identify the specific house
@@ -19,7 +21,7 @@ class HouseDescription extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Description',
+              AppLocal.description.tr(),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,

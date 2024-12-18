@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/theme/app_color.dart';
 
 class SearchWidget extends StatelessWidget {
@@ -18,8 +20,8 @@ class SearchWidget extends StatelessWidget {
         cursorHeight: 14,
         controller: textEditingController,
         decoration: InputDecoration(
-          label: const Text(
-            'Search for a home',
+          label: Text(
+            AppLocal.searchHome.tr(),
             style: TextStyle(
               color: AppColor.mediumColor,
               fontWeight: FontWeight.w300,

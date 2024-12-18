@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:real_estate_app/data/clients/geo_client.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'house_event.dart';
@@ -24,11 +26,11 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       final isConnected = await _isConnected();
       final houses = await _getHouses();
       if (!isConnected) {
-        emit(const HouseErrorState('No internet connection'));
+        emit(HouseErrorState(AppLocal.noInternetConnection.tr()));
       } 
       emit(HouseState(houses: houses,
       favoriteHouseIds: _getFavoriteIds(),
-      errorMessage: (!isConnected) ? 'No internet connection' : '' ));
+      errorMessage: (!isConnected) ? AppLocal.noInternetConnection.tr() : '' ));
     });
 
     on<SearchHouses>((event, emit) {
@@ -42,8 +44,8 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
           return zip.contains(query) || city.contains(query);
         }).toList();
         if (filteredHouses.isEmpty) {
-          emit(const HouseErrorState(
-              'No results found \n Perhaps try another search?'));
+          emit(HouseErrorState(
+              AppLocal.noResultsFound.tr()));
         } else {
           emit(HouseState(houses: filteredHouses));
         }
@@ -69,7 +71,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       final favoriteHouses = await _getFavoriteHouses();
       final houses = await _getHouses();
       if (favoriteHouses.isEmpty) {
-        emit(HouseErrorState('Wishlist is empty'));
+        emit(HouseErrorState(AppLocal.wishlistIsEmpty.tr()));
       } else {
         emit(HouseState(
           houses: houses,
@@ -84,14 +86,14 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       try {
         final favoriteHouses = await _getFavoriteHouses();
         if (favoriteHouses.isEmpty) {
-          emit(HouseErrorState('Wishlist is empty'));
+          emit(HouseErrorState(AppLocal.wishlistIsEmpty.tr()));
         } else {
           emit(HouseState(
               favoriteHouses: favoriteHouses,
               favoriteHouseIds: _getFavoriteIds()));
         }
       } catch (e) {
-        emit(HouseErrorState('Something went wrong. Please try again later.'));
+        emit(HouseErrorState(AppLocal.somethingWentWrongPleaseAgain.tr()));
       }
     });
   }
