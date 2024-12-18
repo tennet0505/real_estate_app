@@ -37,36 +37,33 @@ class _FavoritePageState extends State<FavoritePage> {
             color: AppColor.redColor,
           ));
         } else if (state is HouseErrorState) {
-          return Center(
-            child: Text(
-              state.message,
-              style: const TextStyle(color: Colors.red),
-            ),
+          return EmptyStateWidget(
+            onRefresh: _onRefresh,
+            isFavorite: true,
+            message: state.message,
           );
         } else if (state is HouseState) {
-          return state.favoriteHouses.isEmpty
-              ? EmptyStateWidget(onRefresh: _onRefresh, isFavorite: true,)
-              : ListView.builder(
-                  itemCount: state.favoriteHouses.length,
-                  itemExtent: 220,
-                  itemBuilder: (context, index) {
-                    final house = state.favoriteHouses[index];
-                    return FavoriteListWidget(
-                      house: house,
-                      onDelete: () {
-                        removeHouse(house.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content:
-                                  Text("${house.zip} removed from favorites"),
-                              backgroundColor: Colors.red),
-                        );
-                      },
-                    );
-                  },
-                );
+          return ListView.builder(
+            itemCount: state.favoriteHouses.length,
+            itemExtent: 220,
+            itemBuilder: (context, index) {
+              final house = state.favoriteHouses[index];
+              return FavoriteListWidget(
+                house: house,
+                onDelete: () {
+                  removeHouse(house.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text("${house.zip} removed from the wishlist"),
+                        backgroundColor: Colors.red),
+                  );
+                },
+              );
+            },
+          );
         } else {
-          return EmptyStateWidget(onRefresh: _onRefresh);
+          return EmptyStateWidget(
+              onRefresh: _onRefresh, message: 'Something went wrong.');
         }
       },
     );

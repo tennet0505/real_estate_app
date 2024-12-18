@@ -22,29 +22,13 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       emit(const HouseLoadingState());
 
       final isConnected = await _isConnected();
-
-      try {
-        if (!isConnected) {
-          emit(const HouseErrorState('No internet connection'));
-          final houses = await repository.getHousesFromDB();
-          final housesWithDistances = await calculateDistances(houses);
-          _allHouses.clear();
-          _allHouses.addAll(housesWithDistances);
-
-          emit(HouseState(houses: housesWithDistances));
-        } else {
-          final houses = await _getHouses();
-
-          _allHouses.clear();
-          _allHouses.addAll(houses);
-
-          emit(HouseState(
-              houses: houses,
-              favoriteHouseIds: _getFavoriteIds()));
-        }
-      } catch (e) {
-        emit(HouseErrorState('Something went wrong. Please try again later.'));
-      }
+      final houses = await _getHouses();
+      if (!isConnected) {
+        emit(const HouseErrorState('No internet connection'));
+      } 
+      emit(HouseState(houses: houses,
+      favoriteHouseIds: _getFavoriteIds(),
+      errorMessage: (!isConnected) ? 'No internet connection' : '' ));
     });
 
     on<SearchHouses>((event, emit) {
@@ -57,7 +41,12 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
           final city = house.city.toLowerCase();
           return zip.contains(query) || city.contains(query);
         }).toList();
-        emit(HouseState(houses: filteredHouses));
+        if (filteredHouses.isEmpty) {
+          emit(const HouseErrorState(
+              'No results found \n Perhaps try another search?'));
+        } else {
+          emit(HouseState(houses: filteredHouses));
+        }
       }
     });
 
@@ -79,45 +68,70 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       );
       final favoriteHouses = await _getFavoriteHouses();
       final houses = await _getHouses();
-      emit(HouseState(
-        houses: houses,
-        favoriteHouses:favoriteHouses,
-        favoriteHouseIds: updatedFavoriteIds,
-      ));
+      if (favoriteHouses.isEmpty) {
+        emit(HouseErrorState('Wishlist is empty'));
+      } else {
+        emit(HouseState(
+          houses: houses,
+          favoriteHouses: favoriteHouses,
+          favoriteHouseIds: updatedFavoriteIds,
+        ));
+      }
     });
 
     on<GetFavoriteHouses>((event, emit) async {
       emit(HouseLoadingState());
       try {
         final favoriteHouses = await _getFavoriteHouses();
-        emit(HouseState(favoriteHouses: favoriteHouses, favoriteHouseIds: _getFavoriteIds()));
+        if (favoriteHouses.isEmpty) {
+          emit(HouseErrorState('Wishlist is empty'));
+        } else {
+          emit(HouseState(
+              favoriteHouses: favoriteHouses,
+              favoriteHouseIds: _getFavoriteIds()));
+        }
       } catch (e) {
-        emit(HouseErrorState(e.toString()));
+        emit(HouseErrorState('Something went wrong. Please try again later.'));
       }
     });
   }
 
   Future<List<House>> _getHouses() async {
+    final isConnected = await _isConnected();
     try {
-      final houses = await repository.getHouses();
-      final housesWithDistances = await calculateDistances(houses);
-      return housesWithDistances;
+      if (!isConnected) {
+        final houses = await _getHousesFromDB();
+        final housesWithDistances = await calculateDistances(houses);
+        _allHouses.clear();
+        _allHouses.addAll(houses);
+        return housesWithDistances;
+      } else {
+        final houses = await repository.getHouses();
+        final housesWithDistances = await calculateDistances(houses);
+        _allHouses.clear();
+        _allHouses.addAll(houses);
+        return housesWithDistances;
+      }
     } catch (e) {
       return [];
     }
   }
 
   Future<List<House>> _getFavoriteHouses() async {
+    final houses = await _getHouses();
+    final housesWithDistances = await calculateDistances(houses);
+    final favoriteIds = _getFavoriteIds();
+    final favoriteHouses = housesWithDistances
+        .where((house) => favoriteIds.contains(house.id))
+        .toList();
+    return favoriteHouses;
+  }
+
+  Future<List<House>> _getHousesFromDB() async {
     try {
-      final houses = await repository.getHouses();
+      final houses = await repository.getHousesFromDB();
       final housesWithDistances = await calculateDistances(houses);
-
-      final favoriteIds = _getFavoriteIds();
-      final favoriteHouses = housesWithDistances
-          .where((house) => favoriteIds.contains(house.id))
-          .toList();
-
-      return favoriteHouses;
+      return housesWithDistances;
     } catch (e) {
       return [];
     }
@@ -156,7 +170,6 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     if (connectivityResult == ConnectivityResult.none) {
       return false; // No connection at all.
     }
-
     // Perform an actual internet check (ping).
     try {
       final result = await InternetAddress.lookup('google.com');
@@ -166,7 +179,6 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     } on SocketException catch (_) {
       return false; // Internet is not reachable.
     }
-
     return false;
   }
 }

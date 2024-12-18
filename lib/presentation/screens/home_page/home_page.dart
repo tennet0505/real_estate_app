@@ -33,46 +33,53 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        BlocBuilder<HouseBloc, HouseState>(
-          builder: (context, state) {
-            if (state is HouseLoadingState) {
-              return const Center(
-                  child: CircularProgressIndicator(
-                color: AppColor.redColor,
-              ));
-            } else if (state is HouseErrorState) {
-              return Center(
-                child: Text(
-                  state.message,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              );
-            } else if (state is HouseState) {
-              return RefreshIndicator(
-                color: AppColor.backgroundColorDarkTertiary,
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                onRefresh: _onRefresh, // Refresh handler
-                child: state.houses.isEmpty
-                    ? EmptyStateWidget(onRefresh: _onRefresh)
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(top: 54),
-                        itemCount: state.houses.length,
-                        itemExtent: 128,
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        itemBuilder: (context, index) {
-                          final house = state.houses[index];
-                          return ListItemWidget(house: house, state: state);
-                        },
-                      ),
-              );
-            } else {
-              return EmptyStateWidget(
-                onRefresh: _onRefresh,
-                showRefreshButton: true,
+        BlocListener<HouseBloc, HouseState>(
+          listener: (context, state) {
+            if (state is HouseState && state.errorMessage != '') {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('No internet connection.'),backgroundColor: Colors.red),
               );
             }
           },
+          child: BlocBuilder<HouseBloc, HouseState>(
+            builder: (context, state) {
+              if (state is HouseLoadingState) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColor.redColor,
+                  ),
+                );
+              } else if (state is HouseErrorState) {
+                return EmptyStateWidget(
+                  onRefresh: _onRefresh,
+                  message: state.message,
+                );
+              } else if (state is HouseState) {
+                return RefreshIndicator(
+                  color: AppColor.backgroundColorDarkTertiary,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  onRefresh: _onRefresh, // Refresh handler
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(top: 54),
+                    itemCount: state.houses.length,
+                    itemExtent: 128,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    itemBuilder: (context, index) {
+                      final house = state.houses[index];
+                      return ListItemWidget(house: house, state: state);
+                    },
+                  ),
+                );
+              } else {
+                return EmptyStateWidget(
+                  onRefresh: _onRefresh,
+                  showRefreshButton: true,
+                  message: 'Something went wrong.\n Try to refresh.',
+                );
+              }
+            },
+          ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),

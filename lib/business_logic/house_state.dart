@@ -3,12 +3,14 @@ part of 'house_bloc.dart';
 class HouseState extends Equatable {
   final List<House> houses;
   final List<House> favoriteHouses;
-  final Set<int> favoriteHouseIds; // Track favorite house IDs
+  final Set<int> favoriteHouseIds; 
+  final String errorMessage; 
 
   const HouseState({
     this.houses = const [],
     this.favoriteHouses = const [],
     this.favoriteHouseIds = const {},
+    this.errorMessage = ''
   });
 
   @override
