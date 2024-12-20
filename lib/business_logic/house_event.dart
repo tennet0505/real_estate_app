@@ -18,10 +18,15 @@ class GetFavoriteHouses extends HouseEvent {
 }
 
 class ToggleFavoriteHouseEvent extends HouseEvent {
-  final int houseId;
-  ToggleFavoriteHouseEvent(this.houseId);
+  final House house;
+  ToggleFavoriteHouseEvent(this.house);
 }
 
 class RefreshHouses extends HouseEvent {
   const RefreshHouses();
+}
+
+class RemovedFromFavorite extends HouseEvent {
+  
+  const RemovedFromFavorite();
 }

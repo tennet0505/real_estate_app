@@ -29,20 +29,34 @@ class HouseDescription extends StatelessWidget {
               ),
             ),
             Spacer(),
-            IconButton(
-              icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border_outlined,
-                color: isFavorite
-                    ? Colors.red
-                    : Theme.of(context).textTheme.titleLarge?.color,
-              ),
-              onPressed: () {
-                // Toggle favorite status
-                context
-                    .read<HouseBloc>()
-                    .add(ToggleFavoriteHouseEvent(house.id));
-              },
-            ),
+            BlocConsumer<HouseBloc, HouseState>(listener: (context, state) {
+              if (state is HouseRemovedFromFavoriteState) {
+                ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                      content: Text(
+                          "${state.removedHouseZip} ${AppLocal.removeFromList.tr()}"),
+                      backgroundColor: Colors.red),
+                );
+              }
+            }, builder: (context, state) {
+              return IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border_outlined,
+                  color: isFavorite
+                      ? Colors.red
+                      : Theme.of(context).textTheme.titleLarge?.color,
+                ),
+                onPressed: () {
+                  context.read<HouseBloc>().add(ToggleFavoriteHouseEvent(house));
+                  if (isFavorite) {
+                    context.read<HouseBloc>().add(const RemovedFromFavorite());
+                  } 
+
+                },
+              );
+            }),
           ],
         ),
         const SizedBox(height: 16),

@@ -37,3 +37,8 @@ class HouseErrorState extends HouseState {
   final String message;
   const HouseErrorState(this.message);
 }
+
+class HouseRemovedFromFavoriteState extends HouseState {
+  final String? removedHouseZip;
+  const HouseRemovedFromFavoriteState(this.removedHouseZip);
+}

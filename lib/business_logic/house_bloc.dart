@@ -21,6 +21,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
   String searchQuery = '';
   Set<int> _favoriteIds = {}; // Cached favorite IDs
   bool _isDataLoaded = false; // Flag to check if data is already loaded
+  String? _removedHouseZip;
 
   HouseBloc(this.repository, this.prefs) : super(const HouseLoadingState()) {
     on<GetHouses>(_handleGetHouses);
@@ -28,6 +29,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     on<ToggleFavoriteHouseEvent>(_handleToggleFavorite);
     on<GetFavoriteHouses>(_handleGetFavoriteHouses);
     on<RefreshHouses>(_handleRefreshHouses); // Added event for pull-to-refresh
+    on<RemovedFromFavorite>(_handleRemovedFromFavoriteHouses);
   }
 
   // Method to refresh the favoriteIds cache from SharedPreferences
@@ -86,10 +88,11 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
   Future<void> _handleToggleFavorite(
       ToggleFavoriteHouseEvent event, Emitter<HouseState> emit) async {
     // Toggle favorite state
-    if (_favoriteIds.contains(event.houseId)) {
-      _favoriteIds.remove(event.houseId);
+    if (_favoriteIds.contains(event.house.id)) {
+      _favoriteIds.remove(event.house.id);
+      _removedHouseZip = event.house.zip;
     } else {
-      _favoriteIds.add(event.houseId);
+      _favoriteIds.add(event.house.id);
     }
 
     // Persist favorite IDs
@@ -116,6 +119,13 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
         favoriteHouses: favoriteHouses,
         favoriteHouseIds: _favoriteIds, // Use cached favorite IDs
       ));
+    }
+  }
+
+  Future<void> _handleRemovedFromFavoriteHouses(
+      RemovedFromFavorite event, Emitter<HouseState> emit) async {
+    if (_removedHouseZip != null) {
+      emit(HouseRemovedFromFavoriteState(_removedHouseZip));
     }
   }
 

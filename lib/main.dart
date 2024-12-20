@@ -50,8 +50,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
-        return BlocProvider.value(
-          value: houseBloc, 
+        return BlocProvider(
+          create: (_) => houseBloc,
           child: MaterialApp(
             title: AppLocal.companyTitle,
             theme: ThemeDataStyle.light,

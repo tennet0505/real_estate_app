@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/screens/favorite_page/favorite_list_widget.dart';
 import 'package:real_estate_app/presentation/widgets/empty_state_widget.dart';
@@ -21,8 +22,8 @@ class _FavoritePageState extends State<FavoritePage> {
     _onRefresh();
   }
 
-  void removeHouse(int houseId) {
-    context.read<HouseBloc>().add(ToggleFavoriteHouseEvent(houseId));
+  void removeHouse(House house) {
+    context.read<HouseBloc>().add(ToggleFavoriteHouseEvent(house));
   }
 
   Future<void> _onRefresh() async {
@@ -46,7 +47,19 @@ class _FavoritePageState extends State<FavoritePage> {
           ),
         ),
       ),
-      body: BlocBuilder<HouseBloc, HouseState>(
+      body: BlocConsumer<HouseBloc, HouseState>(
+        listener: (context, state) {
+          if (state is HouseRemovedFromFavoriteState) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                    content: Text(
+                        "${state.removedHouseZip} ${AppLocal.removeFromList.tr()}"),
+                    backgroundColor: Colors.red),
+              );
+          }
+        },
         builder: (context, state) {
           if (state is HouseLoadingState) {
             return const Center(
@@ -68,13 +81,8 @@ class _FavoritePageState extends State<FavoritePage> {
                 return FavoriteListWidget(
                   house: house,
                   onDelete: () {
-                    removeHouse(house.id);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              "${house.zip} ${AppLocal.removeFromList.tr()}"),
-                          backgroundColor: Colors.red),
-                    );
+                    removeHouse(house);
+                    context.read<HouseBloc>().add(const RemovedFromFavorite());
                   },
                 );
               },
