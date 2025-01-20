@@ -1,12 +1,14 @@
+import 'dart:io';
 import 'package:bloc/bloc.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
+import 'package:real_estate_app/business_logic/internet_cubitt/cubit/internet_cubit_cubit.dart';
 import 'package:real_estate_app/data/clients/geo_client.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 part 'house_event.dart';
 part 'house_state.dart';
 
@@ -35,6 +37,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     _favoriteIds = favoriteIds.map(int.parse).toSet();
   }
 
+  //Method to handle GetHouses event
   Future<void> _handleGetHouses(GetHouses event, Emitter<HouseState> emit) async {
     if (_isDataLoaded) {
       // If data is already loaded, just return the existing houses
@@ -63,6 +66,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     ));
   }
 
+  //Method to handle SearchHouses event
   void _handleSearchHouses(SearchHouses event, Emitter<HouseState> emit) {
     searchQuery = event.query.trim().toLowerCase();
 
@@ -81,6 +85,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     }
   }
 
+//Method to handle ToggleFavoriteHouseEvent event
   Future<void> _handleToggleFavorite(
       ToggleFavoriteHouseEvent event, Emitter<HouseState> emit) async {
     // Toggle favorite state
@@ -118,6 +123,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     }
   }
 
+//Method to handle RemovedFromFavorite event
   Future<void> _handleRemovedFromFavoriteHouses(
       RemovedFromFavorite event, Emitter<HouseState> emit) async {
     if (_removedHouseZip != null) {
@@ -125,6 +131,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     }
   }
 
+//Method to handle GetFavoriteHouses event
   Future<void> _handleGetFavoriteHouses(
       GetFavoriteHouses event, Emitter<HouseState> emit) async {
     emit(HouseLoadingState());
@@ -158,6 +165,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     ));
   }
 
+//Method to fetch and cache houses
   Future<List<House>> _fetchAndCacheHouses() async {
     try {
       final isConnected = await _isConnected();
@@ -176,12 +184,14 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     }
   }
 
+//Method to get favorite houses
   Future<List<House>> _getFavoriteHouses() async {
     return _allHouses
         .where((house) => _favoriteIds.contains(house.id))
         .toList();
   }
 
+//Method to calculate distances
   Future<List<House>> _calculateDistances(List<House> houses) async {
     try {
       final position = await geoClient.getCurrentLocation();
@@ -198,20 +208,20 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       return houses;
     }
   }
-
+  
+//Method to check internet connection
   Future<bool> _isConnected() async {
-    return true;
-    // final connectivityResult = await Connectivity().checkConnectivity();
+    final connectivityResult = await Connectivity().checkConnectivity();
 
-    // if (connectivityResult == ConnectivityResult.none) {
-    //   return false;
-    // }
+    if (connectivityResult == ConnectivityResult.none) {
+      return false;
+    }
 
-    // try {
-    //   final result = await InternetAddress.lookup('google.com');
-    //   return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-    // } on SocketException {
-    //   return false;
-    // }
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException {
+      return false;
+    }
   }
 }
