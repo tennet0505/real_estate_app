@@ -90,7 +90,7 @@ The app uses the BLoC pattern for managing state. Key components include:
 
    ```bash
    git clone https://github.com/tennet0505/real_estate_app
-   cd house_finder_app
+   cd real_estate_app
    ```
 
 2. **Install Dependencies:**
