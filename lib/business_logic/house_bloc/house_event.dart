@@ -27,6 +27,9 @@ class RefreshHouses extends HouseEvent {
 }
 
 class RemovedFromFavorite extends HouseEvent {
-  
   const RemovedFromFavorite();
+}
+
+abstract class Event {
+  const Event();
 }

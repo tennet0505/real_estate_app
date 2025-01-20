@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:mockito/mockito.dart';
-import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc/house_bloc.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/main.dart';

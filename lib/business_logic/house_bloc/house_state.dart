@@ -15,7 +15,7 @@ class HouseState extends Equatable {
 
   @override
   List<Object?> get props => [houses, favoriteHouses, favoriteHouseIds];
-
+ 
   HouseState copyWith({
     List<House>? houses,
     List<House>? favoriteHouses,

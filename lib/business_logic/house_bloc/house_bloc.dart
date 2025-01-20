@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:real_estate_app/data/clients/geo_client.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/data/models/house.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,8 +35,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
     _favoriteIds = favoriteIds.map(int.parse).toSet();
   }
 
-  Future<void> _handleGetHouses(
-      GetHouses event, Emitter<HouseState> emit) async {
+  Future<void> _handleGetHouses(GetHouses event, Emitter<HouseState> emit) async {
     if (_isDataLoaded) {
       // If data is already loaded, just return the existing houses
       final houses = _allHouses;
@@ -204,17 +200,18 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
   }
 
   Future<bool> _isConnected() async {
-    final connectivityResult = await Connectivity().checkConnectivity();
+    return true;
+    // final connectivityResult = await Connectivity().checkConnectivity();
 
-    if (connectivityResult == ConnectivityResult.none) {
-      return false;
-    }
+    // if (connectivityResult == ConnectivityResult.none) {
+    //   return false;
+    // }
 
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-    } on SocketException {
-      return false;
-    }
+    // try {
+    //   final result = await InternetAddress.lookup('google.com');
+    //   return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    // } on SocketException {
+    //   return false;
+    // }
   }
 }

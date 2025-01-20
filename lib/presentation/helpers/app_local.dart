@@ -1,4 +1,4 @@
-abstract class AppLocal {
+class AppLocal {
   static const companyTitle = 'company_title';
   static const refresh = 'refresh';
   static const designAndDevelopment = 'design_and_development';

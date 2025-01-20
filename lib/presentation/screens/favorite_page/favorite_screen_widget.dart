@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc/house_bloc.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/screens/favorite_page/favorite_list_widget.dart';

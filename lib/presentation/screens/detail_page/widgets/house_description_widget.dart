@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc/house_bloc.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 
@@ -32,13 +32,13 @@ class HouseDescription extends StatelessWidget {
             BlocConsumer<HouseBloc, HouseState>(listener: (context, state) {
               if (state is HouseRemovedFromFavoriteState) {
                 ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                      content: Text(
-                          "${state.removedHouseZip} ${AppLocal.removeFromList.tr()}"),
-                      backgroundColor: Colors.red),
-                );
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            "${state.removedHouseZip} ${AppLocal.removeFromList.tr()}"),
+                        backgroundColor: Colors.red),
+                  );
               }
             }, builder: (context, state) {
               return IconButton(
@@ -49,11 +49,12 @@ class HouseDescription extends StatelessWidget {
                       : Theme.of(context).textTheme.titleLarge?.color,
                 ),
                 onPressed: () {
-                  context.read<HouseBloc>().add(ToggleFavoriteHouseEvent(house));
+                  BlocProvider.of<HouseBloc>(context)
+                      .add(ToggleFavoriteHouseEvent(house));
+                  // context.read<HouseBloc>().add(ToggleFavoriteHouseEvent(house));
                   if (isFavorite) {
                     context.read<HouseBloc>().add(const RemovedFromFavorite());
-                  } 
-
+                  }
                 },
               );
             }),

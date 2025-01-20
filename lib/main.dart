@@ -1,9 +1,11 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc/house_bloc.dart';
+import 'package:real_estate_app/business_logic/internet_cubitt/cubit/internet_cubit_cubit.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
@@ -50,8 +52,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
-        return BlocProvider(
-          create: (_) => houseBloc,
+        return 
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<HouseBloc>(create: (context) => houseBloc),
+            BlocProvider<InternetCubit>(create: (context) => InternetCubit(connectivity: Connectivity())),
+          ],
           child: MaterialApp(
             title: AppLocal.companyTitle,
             theme: ThemeDataStyle.light,

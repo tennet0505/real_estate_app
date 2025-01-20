@@ -20,6 +20,7 @@ class HouseLocationMap extends StatelessWidget {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      if (!context.mounted) return;  
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: (Text(AppLocal.locationServicesAreDisabled.tr())),
       ));
@@ -30,6 +31,7 @@ class HouseLocationMap extends StatelessWidget {
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
       permission = await Geolocator.requestPermission();
+      if (!context.mounted) return;  
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: (Text(AppLocal.locationPermissionDenied.tr())),
       ));
@@ -38,7 +40,7 @@ class HouseLocationMap extends StatelessWidget {
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-
+    if (!context.mounted) return;  
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -83,6 +85,7 @@ class HouseLocationMap extends StatelessWidget {
         throw 'Could not launch Google Maps';
       }
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocal.unableToOpenGoogleMaps.tr(),)),
       );
@@ -99,7 +102,10 @@ class HouseLocationMap extends StatelessWidget {
         throw 'Could not launch Apple Maps';
       }
     } catch (e) {
-      print(e);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not launch Apple Maps')),
+      );
     }
   }
 
@@ -113,7 +119,7 @@ class HouseLocationMap extends StatelessWidget {
         height: 240,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.grey[300],
+          color: Colors.transparent,
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),

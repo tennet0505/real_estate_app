@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/theme/app_color.dart';
 
-class ThemeDataStyle {
+abstract class ThemeDataStyle {
   static ThemeData light = ThemeData(
     useMaterial3: true,
     colorScheme:

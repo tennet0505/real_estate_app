@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc/house_bloc.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/theme/app_color.dart';
 import 'package:real_estate_app/presentation/screens/home_page/widgets/list_item_widget.dart';
@@ -42,15 +42,7 @@ class _HomePageState extends State<HomePage> {
       },
       child: Stack(
         children: [
-          BlocListener<HouseBloc, HouseState>(
-            listener: (context, state) {
-              if (state is HouseState && state.errorMessage != '') {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(AppLocal.noInternetConnection.tr(),),backgroundColor: Colors.red),
-                );
-              }
-            },
-            child: BlocBuilder<HouseBloc, HouseState>(
+          BlocBuilder<HouseBloc, HouseState>(
               builder: (context, state) {
                 if (state is HouseLoadingState) {
                   return const Center(
@@ -89,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             ),
-          ),
+          // ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: SearchWidget(textEditingController: textEditingController),

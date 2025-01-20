@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/business_logic/house_bloc.dart';
+import 'package:real_estate_app/business_logic/house_bloc/house_bloc.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/screens/home_page/widgets/item_house_widget.dart';
 
 class ListItemWidget extends StatelessWidget {
   final HouseState state;
-  
+
   const ListItemWidget({
     super.key,
-    required this.house, 
+    required this.house,
     required this.state,
   });
   final House house;

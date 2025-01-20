@@ -1,4 +1,4 @@
-abstract class AppImages {
+class AppImages {
   static const home = 'images/ic_home.png';
   static const info = 'images/ic_info.png';
   static const banner = 'images/dtt_banner.png';
