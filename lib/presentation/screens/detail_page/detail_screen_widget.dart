@@ -79,32 +79,19 @@ class _DetailPageState extends State<DetailPage>
         builder: (context, state) {
           return Stack(
             children: [
+              Positioned.fill(
+                child:
+                    HouseImageSection(
+                  imageUrl: '${Constants.mainUrl}${house.image}',
+                  id: house.id,
+                ),
+              ),
               SingleChildScrollView(
                 controller: _scrollController,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Stack(
-                      alignment: Alignment.bottomCenter,
-                      clipBehavior: Clip.none,
-                      children: [
-                        HouseImageSection(
-                          imageUrl: '${Constants.mainUrl}${house.image}',
-                          id: house.id,
-                        ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          height: isExpanded ? 20 : 0,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondaryContainer,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(18),
-                              topRight: Radius.circular(18),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    SizedBox(height: 270),
                     Container(
                       color: Theme.of(context).colorScheme.secondaryContainer,
                       child: Padding(
@@ -125,7 +112,8 @@ class _DetailPageState extends State<DetailPage>
                             const SizedBox(height: 30),
                             HouseDescription(
                               house: house,
-                              isFavorite: state.favoriteHouseIds.contains(house.id),
+                              isFavorite:
+                                  state.favoriteHouseIds.contains(house.id),
                             ),
                             const SizedBox(height: 16),
                             Text(
@@ -133,7 +121,10 @@ class _DetailPageState extends State<DetailPage>
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).textTheme.titleLarge?.color,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.color,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -141,6 +132,7 @@ class _DetailPageState extends State<DetailPage>
                               latitude: house.latitude,
                               longitude: house.longitude,
                             ),
+                            SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                           ],
                         ),
                       ),
@@ -153,13 +145,13 @@ class _DetailPageState extends State<DetailPage>
                 left: 0,
                 right: 0,
                 child: AppBar(
-                  foregroundColor: 
-                  context.watch<ThemeProvider>().isDarkMode
+                  foregroundColor: context.watch<ThemeProvider>().isDarkMode
                       ? Colors.white
                       : _calculateArrowColor(_scrollOffset),
-                  backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha:
-                        _calculateOpacity(_scrollOffset),
-                      ),
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary.withValues(
+                            alpha: _calculateOpacity(_scrollOffset),
+                          ),
                   elevation: 0,
                 ),
               ),
