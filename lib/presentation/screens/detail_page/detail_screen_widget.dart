@@ -35,7 +35,6 @@ class _DetailPageState extends State<DetailPage>
   }
 
   double _calculateOpacity(double offset) {
-    print('appBar offset: ${(offset / 100).clamp(0.0, 1.0)}');
     return (offset / 100).clamp(0.0, 1.0);
   }
 
@@ -61,6 +60,14 @@ class _DetailPageState extends State<DetailPage>
     return Color.lerp(Colors.white, Colors.black, opacity)!;
   }
 
+   double _calculateZoomScale() {
+    if (_scrollOffset < 0) {
+      // User is scrolling down, apply zoom
+      return 1 - (_scrollOffset / 1000); // Adjust scaling factor as necessary
+    }
+    return 1; // No zoom when scrolling up
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -70,18 +77,20 @@ class _DetailPageState extends State<DetailPage>
   @override
   Widget build(BuildContext context) {
     final house = ModalRoute.of(context)?.settings.arguments as House;
-
-    print(_scrollOffset);
     return Scaffold(
       body: BlocBuilder<HouseBloc, HouseState>(
         builder: (context, state) {
           return Stack(
             children: [
               Positioned(
-                top: -_scrollOffset * 0.2,
-                child: HouseImageSection(
-                  imageUrl: '${Constants.mainUrl}${house.image}',
-                  id: house.id,
+                top: (_scrollOffset > 0) ? -_scrollOffset * 0.5 : 0,
+                child: Transform.scale(
+                  scale:
+                      _calculateZoomScale(), // Apply zoom only when scrolling down
+                  child: HouseImageSection(
+                    imageUrl: '${Constants.mainUrl}${house.image}',
+                    id: house.id,
+                  ),
                 ),
               ),
               Positioned.fill(
@@ -168,7 +177,7 @@ class _DetailPageState extends State<DetailPage>
                       ? Colors.white
                       : _calculateArrowColor(_scrollOffset),
                   backgroundColor:
-                      Theme.of(context).colorScheme.primary.withValues(
+                      Theme.of(context).appBarTheme.backgroundColor?.withValues(
                             alpha: _calculateOpacity(_scrollOffset),
                           ),
                   elevation: 0,
