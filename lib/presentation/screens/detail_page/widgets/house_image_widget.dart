@@ -11,21 +11,15 @@ class HouseImageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Hero(
-          tag: 'tag_$id',
-          child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              placeholder: (context, url) => CircularProgressIndicator(),
-              errorWidget: (context, url, error) => Image.asset(
-                    height: 270,
-                    AppImages.housePlaceholder,
-                    fit: BoxFit.cover,
-                  ),
-              fit: BoxFit.cover),
-        ),
-      ],
-    );
+    return CachedNetworkImage(
+        height: 270,
+        imageUrl: imageUrl,
+        placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, url, error) => Image.asset(
+              height: 270,
+              AppImages.housePlaceholder,
+              fit: BoxFit.cover,
+            ),
+        fit: BoxFit.cover);
   }
 }
