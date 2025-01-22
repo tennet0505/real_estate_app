@@ -34,17 +34,27 @@ class _DetailPageState extends State<DetailPage>
     });
   }
 
-  double _calculateOpacity(double offset) => (offset / 100).clamp(0.0, 1.0);
-  double _calculateCornerRadiusOffset(
-      double offset, double maxRadius, double minRadius, double maxOffset) {
-    final normalizedOffset = (offset / maxOffset).clamp(0.0, 1.0);
-    return (maxRadius - normalizedOffset * (maxRadius - minRadius))
-        .clamp(minRadius, maxRadius);
+  double _calculateOpacity(double offset) {
+    print('appBar offset: ${(offset / 100).clamp(0.0, 1.0)}');
+    return (offset / 100).clamp(0.0, 1.0);
   }
 
-    double _calculateCornerRadius(double offset) {
-  return _calculateCornerRadiusOffset(offset, 24, 0, 150);
-}
+  double _calculateCornerRadiusOffset(double offset, double maxRadius,
+      double minRadius, double maxOffset, double maxDownOffset) {
+    if (offset > 0) {
+      final normalizedOffset = (offset / maxOffset).clamp(0.0, 1.0);
+      return (maxRadius - normalizedOffset * (maxRadius - minRadius))
+          .clamp(minRadius, maxRadius);
+    } else {
+      final normalizedOffset = (offset.abs() / maxDownOffset).clamp(0.0, 1.0);
+      return (maxRadius - normalizedOffset * (maxRadius - minRadius))
+          .clamp(minRadius, maxRadius);
+    }
+  }
+
+  double _calculateCornerRadius(double offset) {
+    return _calculateCornerRadiusOffset(offset, 24, 0, 150, 25);
+  }
 
   Color _calculateArrowColor(double offset) {
     final opacity = (offset / 100).clamp(0.0, 1.0);
@@ -61,102 +71,110 @@ class _DetailPageState extends State<DetailPage>
   Widget build(BuildContext context) {
     final house = ModalRoute.of(context)?.settings.arguments as House;
 
+    print(_scrollOffset);
     return Scaffold(
       body: BlocBuilder<HouseBloc, HouseState>(
         builder: (context, state) {
-          return Hero(
-            tag: 'tag_$house.id',
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 0,
-                  child: HouseImageSection(
-                    imageUrl: '${Constants.mainUrl}${house.image}',
-                    id: house.id,
-                  ),
+          return Stack(
+            children: [
+              Positioned(
+                top: -_scrollOffset * 0.2,
+                child: HouseImageSection(
+                  imageUrl: '${Constants.mainUrl}${house.image}',
+                  id: house.id,
                 ),
-                Positioned.fill(
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 245),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .secondaryContainer,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(
-                                  _calculateCornerRadius(_scrollOffset)),
-                              topRight: Radius.circular(
-                                  _calculateCornerRadius(_scrollOffset)),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                HousePriceInfo(
-                                  price: formatCurrency(house.price),
-                                  bedrooms: house.bedrooms,
-                                  bathrooms: house.bathrooms,
-                                  size: house.size,
-                                  distanceFromUser: house.distanceFromUser,
-                                ),
-                                const SizedBox(height: 30),
-                                HouseDescription(
-                                  house: house,
-                                  isFavorite:
-                                      state.favoriteHouseIds.contains(house.id),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  AppLocal.location.tr(),
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.color,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                HouseLocationMap(
-                                  latitude: house.latitude,
-                                  longitude: house.longitude,
-                                ),
-                                SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.2),
-                              ],
-                            ),
+              ),
+              Positioned.fill(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 265),
+                      Container(
+                        decoration: BoxDecoration(
+                          color:
+                              Theme.of(context).colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(
+                                _calculateCornerRadius(_scrollOffset)),
+                            topRight: Radius.circular(
+                                _calculateCornerRadius(_scrollOffset)),
                           ),
                         ),
-                      ],
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              HousePriceInfo(
+                                price: formatCurrency(house.price),
+                                bedrooms: house.bedrooms,
+                                bathrooms: house.bathrooms,
+                                size: house.size,
+                                distanceFromUser: house.distanceFromUser,
+                              ),
+                              const SizedBox(height: 30),
+                              HouseDescription(
+                                house: house,
+                                isFavorite:
+                                    state.favoriteHouseIds.contains(house.id),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                AppLocal.location.tr(),
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.color,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              HouseLocationMap(
+                                latitude: house.latitude,
+                                longitude: house.longitude,
+                              ),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.2),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: AppBar(
+                  title: Opacity(
+                    opacity: _calculateOpacity(_scrollOffset),
+                    child: Text(
+                      '${house.zip}, ${house.city}',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'GothamSSm',
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                      ),
                     ),
                   ),
+                  foregroundColor: context.watch<ThemeProvider>().isDarkMode
+                      ? Colors.white
+                      : _calculateArrowColor(_scrollOffset),
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary.withValues(
+                            alpha: _calculateOpacity(_scrollOffset),
+                          ),
+                  elevation: 0,
                 ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AppBar(
-                    foregroundColor: context.watch<ThemeProvider>().isDarkMode
-                        ? Colors.white
-                        : _calculateArrowColor(_scrollOffset),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primary.withValues(
-                              alpha: _calculateOpacity(_scrollOffset),
-                            ),
-                    elevation: 0,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),

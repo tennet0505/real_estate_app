@@ -12,11 +12,11 @@ class HouseImageSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
-        height: 270,
+        height: 290,
         imageUrl: imageUrl,
         placeholder: (context, url) => CircularProgressIndicator(),
         errorWidget: (context, url, error) => Image.asset(
-              height: 270,
+              height: 290,
               AppImages.housePlaceholder,
               fit: BoxFit.cover,
             ),
