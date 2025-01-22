@@ -52,7 +52,7 @@ class _DetailPageState extends State<DetailPage>
   }
 
   double _calculateCornerRadius(double offset) {
-    return _calculateCornerRadiusOffset(offset, 24, 0, 150, 25);
+    return _calculateCornerRadiusOffset(offset, 24, 0, 100, 25);
   }
 
   Color _calculateArrowColor(double offset) {
@@ -60,12 +60,11 @@ class _DetailPageState extends State<DetailPage>
     return Color.lerp(Colors.white, Colors.black, opacity)!;
   }
 
-   double _calculateZoomScale() {
+  double _calculateZoomScale() {
     if (_scrollOffset < 0) {
-      // User is scrolling down, apply zoom
-      return 1 - (_scrollOffset / 1000); // Adjust scaling factor as necessary
+      return 1 - (_scrollOffset / 1000); 
     }
-    return 1; // No zoom when scrolling up
+    return 1;
   }
 
   @override
@@ -99,7 +98,14 @@ class _DetailPageState extends State<DetailPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 265),
+                      Container(
+                          height: 265,
+                          color: Theme.of(context)
+                              .appBarTheme
+                              .backgroundColor
+                              ?.withValues(
+                                alpha: _calculateOpacity(_scrollOffset),
+                              )),
                       Container(
                         decoration: BoxDecoration(
                           color:
@@ -176,10 +182,9 @@ class _DetailPageState extends State<DetailPage>
                   foregroundColor: context.watch<ThemeProvider>().isDarkMode
                       ? Colors.white
                       : _calculateArrowColor(_scrollOffset),
-                  backgroundColor:
-                      Theme.of(context).appBarTheme.backgroundColor?.withValues(
-                            alpha: _calculateOpacity(_scrollOffset),
-                          ),
+                  backgroundColor: (_scrollOffset > 150)
+                      ? Theme.of(context).appBarTheme.backgroundColor
+                      : Colors.transparent,
                   elevation: 0,
                 ),
               ),
