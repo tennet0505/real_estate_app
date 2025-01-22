@@ -21,20 +21,12 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage>
     with SingleTickerProviderStateMixin {
-  bool isExpanded = false;
   final ScrollController _scrollController = ScrollController();
   double _scrollOffset = 0.0;
 
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(const Duration(milliseconds: 200), () {
-      setState(() {
-        isExpanded = true;
-      });
-    });
-
     _scrollController.addListener(() {
       setState(() {
         _scrollOffset = _scrollController.offset;
@@ -89,7 +81,7 @@ class _DetailPageState extends State<DetailPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 250),
+                        SizedBox(height: 245),
                         Container(
                           decoration: BoxDecoration(
                             color: Theme.of(context)
