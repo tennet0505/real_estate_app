@@ -110,9 +110,9 @@ class PoiDetailWidget extends StatelessWidget {
           top: 20,
           right: 20,
           child: CircleAvatar(
-            backgroundColor: Colors.white.withValues(alpha: 0.5),
+            backgroundColor: Colors.black.withValues(alpha: 0.2),
             child: IconButton(
-              icon: Icon(Icons.close, color: Colors.grey),
+              icon: Icon(Icons.close, color: Colors.white),
               onPressed: () {
                 Navigator.pop(context);
               },
