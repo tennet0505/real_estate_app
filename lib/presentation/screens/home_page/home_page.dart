@@ -63,7 +63,10 @@ class _HomePageState extends State<HomePage> {
                   backgroundColor: Theme.of(context).colorScheme.secondary,
                   onRefresh: _onRefresh,
                   child: isShowMap
-                      ? MapScreen()
+                      ? Padding(
+                        padding: const EdgeInsets.only(top: 66),
+                        child: MapScreen(houses: List.from(state.houses)),
+                      )
                       : ListView.builder(
                           padding: const EdgeInsets.only(top: 54),
                           itemCount: state.houses.length,
@@ -100,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                       isShowMap = !isShowMap; // Update state
                     });
                   },
-                  icon: Icon(Icons.map),
+                  icon: Icon(Icons.map, color: Theme.of(context).textTheme.titleLarge?.color),
                 ),
               ],
             ),
