@@ -103,7 +103,9 @@ class _HomePageState extends State<HomePage> {
                       isShowMap = !isShowMap; // Update state
                     });
                   },
-                  icon: Icon(Icons.map, color: Theme.of(context).textTheme.titleLarge?.color),
+                  icon: isShowMap
+                      ? Icon(Icons.map, color: Theme.of(context).textTheme.titleLarge?.color)
+                      : Icon(Icons.list, color: Theme.of(context).textTheme.titleLarge?.color),
                 ),
               ],
             ),
