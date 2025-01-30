@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc/house_bloc.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/constants.dart';
+import 'package:real_estate_app/presentation/helpers/app_images.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/helpers/currency_formater.dart';
 import 'package:real_estate_app/presentation/screens/detail_page/widgets/house_description_widget.dart';
@@ -62,7 +63,7 @@ class _DetailPageState extends State<DetailPage>
 
   double _calculateZoomScale() {
     if (_scrollOffset < 0) {
-      return 1 - (_scrollOffset / 1000); 
+      return 1 - (_scrollOffset / 1000);
     }
     return 1;
   }
@@ -89,6 +90,11 @@ class _DetailPageState extends State<DetailPage>
                   child: HouseImageSection(
                     imageUrl: '${Constants.mainUrl}${house.image}',
                     id: house.id,
+                    color: Theme.of(context)
+                              .appBarTheme
+                              .backgroundColor!
+                              .withValues(
+                                alpha: _calculateOpacity(_scrollOffset),                              ),
                   ),
                 ),
               ),
@@ -168,6 +174,17 @@ class _DetailPageState extends State<DetailPage>
                 left: 0,
                 right: 0,
                 child: AppBar(
+                  leading: IconButton(
+                    icon: Image.asset(
+                      AppImages.arrow,
+                      color: context.watch<ThemeProvider>().isDarkMode
+                          ? Colors.white
+                          : _calculateArrowColor(_scrollOffset),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context); 
+                    },
+                  ),
                   title: Opacity(
                     opacity: _calculateOpacity(_scrollOffset),
                     child: Text(

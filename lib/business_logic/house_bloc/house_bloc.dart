@@ -3,7 +3,6 @@ import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
-import 'package:real_estate_app/business_logic/internet_cubitt/cubit/internet_cubit_cubit.dart';
 import 'package:real_estate_app/data/clients/geo_client.dart';
 import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/data/models/house.dart';

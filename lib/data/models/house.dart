@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:real_estate_app/presentation/maps/map.dart';
 
 part 'house.g.dart';
 
@@ -45,7 +46,8 @@ class House {
   @HiveField(12)
   double? distanceFromUser;
 
-  House(this.distanceFromUser, {
+  House(
+    this.distanceFromUser, {
     required this.id,
     required this.image,
     required this.price,
