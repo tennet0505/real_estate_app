@@ -21,94 +21,92 @@ class PoiDetailWidget extends StatelessWidget {
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white
-                  .withValues(alpha: 0.9), // White background with transparency
-              borderRadius: BorderRadius.all(Radius.circular(16.0)),
+              color: Theme.of(context)
+                  .appBarTheme
+                  .backgroundColor, // White background with transparency
+              borderRadius: BorderRadius.all(Radius.circular(12.0)),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: CachedNetworkImage(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                  child: CachedNetworkImage(
+                    height: 240,
+                    width: double.infinity,
+                    imageUrl: '${Constants.mainUrl}${house.image}',
+                    errorWidget: (context, url, error) => Image.asset(
                       height: 240,
                       width: double.infinity,
-                      imageUrl: '${Constants.mainUrl}${house.image}',
-                      errorWidget: (context, url, error) => Image.asset(
-                        height: 240,
-                        width: double.infinity,
-                        AppImages.housePlaceholder,
-                        fit: BoxFit.cover,
-                      ),
+                      AppImages.housePlaceholder,
                       fit: BoxFit.cover,
                     ),
+                    fit: BoxFit.cover,
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 6, bottom: 10),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            formatCurrency(house.price),
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.1,
-                              color:
-                                  Theme.of(context).textTheme.titleLarge?.color,
-                            ),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${house.zip.replaceAll(' ', '')} ${house.city}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            // height: 1,
+                            color: AppColor.mediumColor,
+                            fontWeight: FontWeight.w400,
+                            letterSpacing: 0.1,
+                            fontFamily: 'GothamSSm',
                           ),
-                          Text(
-                            '${house.zip.replaceAll(' ', '')} ${house.city}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              // height: 1,
-                              color: AppColor.mediumColor,
-                              fontWeight: FontWeight.w400,
-                              letterSpacing: 0.1,
-                              fontFamily: 'GothamSSm',
-                            ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          formatCurrency(house.price),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.1,
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color,
                           ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              IconWidget(
-                                  imageString: AppImages.bed,
-                                  string: '${house.bedrooms}',
-                                  isDetailScreen: false),
-                              IconWidget(
-                                  imageString: AppImages.shower,
-                                  string: '${house.bathrooms}',
-                                  isDetailScreen: false),
-                              IconWidget(
-                                  imageString: AppImages.mapLayer,
-                                  string: '${house.size}',
-                                  isDetailScreen: false),
-                              IconWidget(
-                                  imageString: AppImages.location,
-                                  string:
-                                      formatDistance(house.distanceFromUser),
-                                  isDetailScreen: false),
-                            ],
-                          ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            IconWidget(
+                                imageString: AppImages.bed,
+                                string: '${house.bedrooms}',
+                                isDetailScreen: true),
+                            IconWidget(
+                                imageString: AppImages.shower,
+                                string: '${house.bathrooms}',
+                                isDetailScreen: true),
+                            IconWidget(
+                                imageString: AppImages.mapLayer,
+                                string: '${house.size}',
+                                isDetailScreen: true),
+                            IconWidget(
+                                imageString: AppImages.location,
+                                string: formatDistance(house.distanceFromUser),
+                                isDetailScreen: true),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
         Positioned(
-          top: 20,
-          right: 20,
+          top: 8,
+          right: 8,
           child: CircleAvatar(
             backgroundColor: Colors.black.withValues(alpha: 0.2),
             child: IconButton(
@@ -120,24 +118,38 @@ class PoiDetailWidget extends StatelessWidget {
           ),
         ),
         Positioned(
-          bottom: 68,
+          bottom: 82,
           right: 8,
           child: CircleAvatar(
-            backgroundColor: Colors.white.withValues(alpha: 0.5),
-            child: IconButton(
-                icon: BlocBuilder<HouseBloc, HouseState>(
-                  builder: (context, state) {
-                    if (state is HouseState) {
-                      return Icon(Icons.favorite, color: state.favoriteHouseIds.contains(house.id) ? Colors.red : Colors.grey[350]);
-                    }
-                    return Icon(Icons.favorite, color: Colors.white);
-                  },
-                ),
-                onPressed: () {
-                  // Add your onPressed logic here
-                },
-              ),
+            backgroundColor: Colors.white.withValues(alpha: 0.0),
+            child: BlocBuilder<HouseBloc, HouseState>(
+              builder: (context, state) {
+                final isFavorite = state.favoriteHouseIds.contains(house.id);
+                if (state is HouseState) {
+                  return IconButton(
+                    icon: Icon(
+                      isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border_outlined,
+                      color: isFavorite
+                          ? Colors.red
+                          : Theme.of(context).textTheme.titleLarge?.color,
+                    ),
+                    onPressed: () {
+                      BlocProvider.of<HouseBloc>(context)
+                          .add(ToggleFavoriteHouseEvent(house));
+                      if (state.favoriteHouseIds.contains(house.id)) {
+                        context
+                            .read<HouseBloc>()
+                            .add(const RemovedFromFavorite());
+                      }
+                    },
+                  );
+                }
+                return Icon(Icons.favorite, color: Colors.white);
+              },
             ),
+          ),
         ),
       ],
     );

@@ -30,13 +30,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return BlocListener<InternetCubit, InternetState>(
       listener: (context, state) {
         if (state is InternetIsConnected && state.isConnected == false) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(
-                  AppLocal.noInternetConnection.tr(),
-                ),
-                backgroundColor: Colors.red),
-          );
+          Future.delayed(Duration(seconds: 1), () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(
+                    AppLocal.noInternetConnection.tr(),
+                  ),
+                  backgroundColor: Colors.red),
+            );
+          });
         }
       },
       child: Scaffold(

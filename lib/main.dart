@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -29,17 +30,23 @@ Future<void> main() async {
   final houseBloc = HouseBloc(HouseRepository(), sharedPreferences);
 
   // Initialize EasyLocalization and run the app
-  runApp(
-    EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('nl')],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('en'),
-      child: ChangeNotifierProvider(
-        create: (context) =>
-            ThemeProvider(), // Provide the ThemeProvider to the widget tree
-        child: MyApp(houseBloc: houseBloc), // Pass the houseBloc to MyApp
-      ), // Pass the houseBloc to MyApp
-    ),
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then(
+    (_) {
+      runApp(
+        EasyLocalization(
+          supportedLocales: const [Locale('en'), Locale('nl')],
+          path: 'assets/translations',
+          fallbackLocale: const Locale('en'),
+          child: ChangeNotifierProvider(
+            create: (context) =>
+                ThemeProvider(), // Provide the ThemeProvider to the widget tree
+            child: MyApp(houseBloc: houseBloc), // Pass the houseBloc to MyApp
+          ), // Pass the houseBloc to MyApp
+        ),
+      );
+    },
   );
 }
 
@@ -52,11 +59,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
-        return 
-        MultiBlocProvider(
+        return MultiBlocProvider(
           providers: [
             BlocProvider<HouseBloc>(create: (context) => houseBloc),
-            BlocProvider<InternetCubit>(create: (context) => InternetCubit(connectivity: Connectivity())),
+            BlocProvider<InternetCubit>(
+                create: (context) =>
+                    InternetCubit(connectivity: Connectivity())),
           ],
           child: MaterialApp(
             title: AppLocal.companyTitle,

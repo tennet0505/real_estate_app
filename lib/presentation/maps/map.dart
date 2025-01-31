@@ -8,7 +8,6 @@ import 'package:real_estate_app/presentation/helpers/app_images.dart';
 import 'package:real_estate_app/presentation/maps/widgets/poi_detail_widget.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-
 class MapScreen extends StatefulWidget {
   final List<House> houses;
 
@@ -32,12 +31,20 @@ class _MapScreenState extends State<MapScreen>
     _loadCustomMarker();
   }
 
+  @override
+  void didUpdateWidget(MapScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.houses != oldWidget.houses) {
+      _updateMarkers(); // Reload markers when house list updates
+    }
+  }
+
   Future<void> _loadCustomMarker() async {
     final customIcon = await _getBytesFromAsset(AppImages.logo, 24);
     setState(() {
       _customIcon = BitmapDescriptor.bytes(customIcon);
-      _updateMarkers(); // Update markers after loading icon
     });
+    _updateMarkers(); // Update markers after loading icon
   }
 
   Future<Uint8List> _getBytesFromAsset(String path, int width) async {
@@ -53,7 +60,9 @@ class _MapScreenState extends State<MapScreen>
   }
 
   void _updateMarkers() {
-    if (_customIcon == null) return;
+    if (_customIcon == null) {
+      return; // Prevent updating before the icon is ready
+    }
     setState(() {
       _markers = widget.houses
           .map((house) => Marker(
@@ -79,14 +88,6 @@ class _MapScreenState extends State<MapScreen>
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void didUpdateWidget(MapScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.houses != oldWidget.houses) {
-      _loadMarkers(); // Reload markers when house list updates
-    }
-  }
 
   void _loadMarkers() {
     setState(() {
@@ -114,7 +115,6 @@ class _MapScreenState extends State<MapScreen>
       builder: (BuildContext context) {
         return GestureDetector(
           onTap: () {
-            Navigator.pop(context);
             Navigator.of(context).pushNamed(
               '/detail_screen',
               arguments: housePoi,
