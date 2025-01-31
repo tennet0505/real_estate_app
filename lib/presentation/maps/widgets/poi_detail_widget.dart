@@ -12,7 +12,10 @@ import 'package:real_estate_app/theme/app_color.dart';
 
 class PoiDetailWidget extends StatelessWidget {
   final House house;
-  const PoiDetailWidget({super.key, required this.house});
+  final void Function() onClose;
+
+  const PoiDetailWidget(
+      {super.key, required this.house, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -112,14 +115,14 @@ class PoiDetailWidget extends StatelessWidget {
             child: IconButton(
               icon: Icon(Icons.close, color: Colors.white),
               onPressed: () {
-                Navigator.pop(context);
+                onClose();
               },
             ),
           ),
         ),
         Positioned(
-          bottom: 82,
-          right: 8,
+          bottom: 64,
+          right: 0,
           child: CircleAvatar(
             backgroundColor: Colors.white.withValues(alpha: 0.0),
             child: BlocBuilder<HouseBloc, HouseState>(

@@ -10,8 +10,10 @@ import 'package:flutter/services.dart' show rootBundle;
 
 class MapScreen extends StatefulWidget {
   final List<House> houses;
+  final void Function(House house) onHouseSelected;
 
-  const MapScreen({super.key, required this.houses});
+  const MapScreen(
+      {super.key, required this.houses, required this.onHouseSelected});
 
   @override
   _MapScreenState createState() => _MapScreenState();
@@ -70,7 +72,8 @@ class _MapScreenState extends State<MapScreen>
                 position: LatLng(house.latitude, house.longitude),
                 icon: _customIcon!, // Apply the custom marker icon
                 onTap: () {
-                  _showPoiBottomSheet(context, house);
+                  widget.onHouseSelected(house);
+                  // _showPoiBottomSheet(context, house);
                 },
                 infoWindow: InfoWindow(
                   title: house.zip,
@@ -96,7 +99,7 @@ class _MapScreenState extends State<MapScreen>
                 markerId: MarkerId(house.id.toString()),
                 position: LatLng(house.latitude, house.longitude),
                 onTap: () {
-                  _showPoiBottomSheet(context, house);
+                  // _showPoiBottomSheet(context, house);
                 },
                 infoWindow: InfoWindow(
                   title: house.zip,
@@ -105,28 +108,6 @@ class _MapScreenState extends State<MapScreen>
               ))
           .toSet();
     });
-  }
-
-  void _showPoiBottomSheet(BuildContext context, House housePoi) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: false,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushNamed(
-              '/detail_screen',
-              arguments: housePoi,
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-            child: PoiDetailWidget(house: housePoi),
-          ),
-        );
-      },
-    );
   }
 
   @override

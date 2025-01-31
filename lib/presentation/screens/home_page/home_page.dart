@@ -2,8 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:real_estate_app/business_logic/house_bloc/house_bloc.dart';
+import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/maps/map.dart';
+import 'package:real_estate_app/presentation/maps/widgets/poi_detail_widget.dart';
 import 'package:real_estate_app/theme/app_color.dart';
 import 'package:real_estate_app/presentation/screens/home_page/widgets/list_item_widget.dart';
 import 'package:real_estate_app/presentation/screens/home_page/widgets/search_widget.dart';
@@ -16,9 +18,14 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   final textEditingController = TextEditingController();
   bool isShowMap = false; // Move isShowMap to class-level
+  House? selectedHouse;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -36,8 +43,22 @@ class _HomePageState extends State<HomePage> {
     context.read<HouseBloc>().add(RefreshHouses());
   }
 
+  void _onHouseSelected(House house) {
+    setState(() {
+      selectedHouse = house; // Set the selected house
+    });
+  }
+
+  void _closeDetail() {
+    setState(() {
+      selectedHouse = null; // Reset the selected house
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus(); // Hide keyboard
@@ -64,9 +85,14 @@ class _HomePageState extends State<HomePage> {
                   onRefresh: _onRefresh,
                   child: isShowMap
                       ? Padding(
-                        padding: const EdgeInsets.only(top: 66),
-                        child: MapScreen(houses: List.from(state.houses)),
-                      )
+                          padding: const EdgeInsets.only(top: 66),
+                          child: MapScreen(
+                            houses: List.from(state.houses),
+                            onHouseSelected: (House house) {
+                              _onHouseSelected(house);
+                            },
+                          ),
+                        )
                       : ListView.builder(
                           padding: const EdgeInsets.only(top: 54),
                           itemCount: state.houses.length,
@@ -100,16 +126,64 @@ class _HomePageState extends State<HomePage> {
                 IconButton(
                   onPressed: () {
                     setState(() {
-                      isShowMap = !isShowMap; // Update state
+                      isShowMap = !isShowMap;
                     });
                   },
                   icon: !isShowMap
-                      ? Icon(Icons.map, color: Theme.of(context).textTheme.titleLarge?.color)
-                      : Icon(Icons.list, color: Theme.of(context).textTheme.titleLarge?.color),
+                      ? Icon(Icons.map,
+                          color: Theme.of(context).textTheme.titleLarge?.color)
+                      : Icon(Icons.list,
+                          color: Theme.of(context).textTheme.titleLarge?.color),
                 ),
               ],
             ),
           ),
+          if (selectedHouse != null)
+            Positioned(
+              top: 0,
+              bottom: 0, // Adjust this value for positioning
+              left: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () {
+                  _onRefresh();
+                  _closeDetail(); // Ensure it's called correctly
+                },
+                child: Stack(
+                  children: [
+                    Container(
+                      color: Colors.transparent,
+                      height: double.infinity, // Ensur
+                      width: double.infinity, // Ensures full width
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      left: 16,
+                      right: 16,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            '/detail_screen',
+                            arguments: selectedHouse!,
+                          );
+                        },
+                        child: Container(
+                          color: Colors.transparent,
+                          height: 340, // Ensur
+                          width: double.infinity,
+                          child: PoiDetailWidget(
+                            house: selectedHouse!,
+                            onClose: () {
+                              _closeDetail(); // Ensure it's called correctly
+                            },
+                          ), // Ensures full width
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

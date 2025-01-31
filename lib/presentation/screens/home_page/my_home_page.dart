@@ -16,12 +16,25 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
+  final PageController _pageController = PageController();
 
-  final List<Widget> pages = [HomePage(), FavoritePage(), SettingsPage()];
+  final List<Widget> pages = [
+    const HomePage(),
+    const FavoritePage(),
+    const SettingsPage(),
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _selectTab(int index) {
     if (_selectedIndex == index) return;
     setState(() {
       _selectedIndex = index;
+      _pageController.jumpToPage(_selectedIndex);
     });
   }
 
@@ -29,14 +42,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return BlocListener<InternetCubit, InternetState>(
       listener: (context, state) {
-        if (state is InternetIsConnected && state.isConnected == false) {
-          Future.delayed(Duration(seconds: 1), () {
+        if (state is InternetIsConnected && !state.isConnected) {
+          Future.delayed(const Duration(seconds: 1), () {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content: Text(
-                    AppLocal.noInternetConnection.tr(),
-                  ),
-                  backgroundColor: Colors.red),
+                content: Text(AppLocal.noInternetConnection.tr()),
+                backgroundColor: Colors.red,
+              ),
             );
           });
         }
@@ -61,12 +73,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-        body: pages[_selectedIndex],
+        body: PageView(
+          controller: _pageController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: pages,
+        ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
+                color: Colors.black.withOpacity(0.1),
                 spreadRadius: 2,
                 blurRadius: 5,
                 offset: const Offset(0, -2),

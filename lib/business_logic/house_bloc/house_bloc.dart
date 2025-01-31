@@ -141,6 +141,7 @@ class HouseBloc extends Bloc<HouseEvent, HouseState> {
       emit(HouseErrorState(AppLocal.wishlistIsEmpty.tr()));
     } else {
       emit(HouseState(
+        houses: _allHouses,
         favoriteHouses: favoriteHouses,
         favoriteHouseIds: _favoriteIds, // Use cached favorite IDs
       ));
