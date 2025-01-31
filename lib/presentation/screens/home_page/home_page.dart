@@ -146,7 +146,6 @@ class _HomePageState extends State<HomePage>
               right: 0,
               child: GestureDetector(
                 onTap: () {
-                  _onRefresh();
                   _closeDetail(); // Ensure it's called correctly
                 },
                 child: Stack(
