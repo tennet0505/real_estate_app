@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:real_estate_app/constants.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_images.dart';
 import 'package:real_estate_app/presentation/screens/settings_page/settings_page.dart';
@@ -22,7 +23,6 @@ class _DetailPhotosWidgetState extends State<DetailPhotosWidget> {
   void initState() {
     super.initState();
     _pageController = PageController();
-    // Allow both portrait and landscape modes for this screen
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -44,12 +44,15 @@ class _DetailPhotosWidgetState extends State<DetailPhotosWidget> {
   @override
   Widget build(BuildContext context) {
     final house = ModalRoute.of(context)?.settings.arguments as House;
-    final imageUrl =
-        house.image; // Assuming house.images is a List<String> of image URLs
+    final imageUrl = '${Constants.mainUrl}${house.image}';
     final imageCount = 10;
 
     return Scaffold(
-      backgroundColor: context.watch<ThemeProvider>().isDarkMode ? Colors.black : isChangeColor ? Colors.white : Colors.black,
+      backgroundColor: context.watch<ThemeProvider>().isDarkMode
+          ? Colors.black
+          : isChangeColor
+              ? Colors.white
+              : Colors.black,
       body: Stack(
         children: [
           InteractiveViewer(
@@ -74,7 +77,6 @@ class _DetailPhotosWidgetState extends State<DetailPhotosWidget> {
                       });
                     },
                     child: CachedNetworkImage(
-                      height: 290,
                       width: MediaQuery.of(context)
                           .size
                           .width, // Full screen width
@@ -83,7 +85,6 @@ class _DetailPhotosWidgetState extends State<DetailPhotosWidget> {
                         child: CircularProgressIndicator(),
                       ),
                       errorWidget: (context, url, error) => Image.asset(
-                        height: 290,
                         width: MediaQuery.of(context).size.width,
                         AppImages.housePlaceholder,
                         fit: BoxFit.fitWidth,
@@ -99,7 +100,14 @@ class _DetailPhotosWidgetState extends State<DetailPhotosWidget> {
             top: 48,
             right: 10,
             child: IconButton(
-              icon: Icon(Icons.close, color: context.watch<ThemeProvider>().isDarkMode ? Colors.white : isChangeColor ? Colors.black : Colors.white,),
+              icon: Icon(
+                Icons.close,
+                color: context.watch<ThemeProvider>().isDarkMode
+                    ? Colors.white
+                    : isChangeColor
+                        ? Colors.black
+                        : Colors.white,
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },

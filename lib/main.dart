@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeDataStyle.light,
             darkTheme: ThemeDataStyle.dark,
             themeMode:
-                themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+              themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             routes: {
               "/main_screen": (context) => const MyHomePage(),
               "/detail_screen": (context) => const DetailPage(),
