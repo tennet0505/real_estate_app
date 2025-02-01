@@ -170,7 +170,10 @@ class _DetailPageState extends State<DetailPage>
                   ),
                 ),
               ),
-              Positioned.fill(
+              Positioned(
+                top: 0,
+                height: 280,
+                width: MediaQuery.of(context).size.width,
                 child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pushNamed(
@@ -179,8 +182,7 @@ class _DetailPageState extends State<DetailPage>
                       );
                     },
                     child: Container(
-                      width: double.infinity,
-                      height: 290,
+                      height: 250,
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                       ),
@@ -189,7 +191,7 @@ class _DetailPageState extends State<DetailPage>
               Positioned(
                 top: 0,
                 left: 0,
-                right: 0,
+                width: 50,
                 child: AppBar(
                   leading: IconButton(
                     icon: Image.asset(
