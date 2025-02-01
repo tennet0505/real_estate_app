@@ -11,6 +11,7 @@ import 'package:real_estate_app/data/clients/repository.dart';
 import 'package:real_estate_app/data/models/house.dart';
 import 'package:real_estate_app/presentation/helpers/app_local.dart';
 import 'package:real_estate_app/presentation/screens/detail_page/detail_screen_widget.dart';
+import 'package:real_estate_app/presentation/screens/detail_page/widgets/details_photo.dart';
 import 'package:real_estate_app/presentation/screens/favorite_page/favorite_screen_widget.dart';
 import 'package:real_estate_app/presentation/screens/home_page/my_home_page.dart';
 import 'package:real_estate_app/presentation/screens/about_page/about_page.dart';
@@ -78,6 +79,7 @@ class MyApp extends StatelessWidget {
               "/favorite_screen": (context) => const FavoritePage(),
               "/settings_screen": (context) => const SettingsPage(),
               "/about_screen": (context) => const AboutPage(),
+              "/photo_screen": (context) => const DetailPhotosWidget(),
             },
             initialRoute: "/main_screen",
             // Add localization delegates

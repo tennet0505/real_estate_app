@@ -91,10 +91,11 @@ class _DetailPageState extends State<DetailPage>
                     imageUrl: '${Constants.mainUrl}${house.image}',
                     id: house.id,
                     color: Theme.of(context)
-                              .appBarTheme
-                              .backgroundColor!
-                              .withValues(
-                                alpha: _calculateOpacity(_scrollOffset),                              ),
+                        .appBarTheme
+                        .backgroundColor!
+                        .withValues(
+                          alpha: _calculateOpacity(_scrollOffset),
+                        ),
                   ),
                 ),
               ),
@@ -169,6 +170,22 @@ class _DetailPageState extends State<DetailPage>
                   ),
                 ),
               ),
+              Positioned.fill(
+                child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        '/photo_screen',
+                        arguments: house,
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 290,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                      ),
+                    )),
+              ),
               Positioned(
                 top: 0,
                 left: 0,
@@ -182,7 +199,7 @@ class _DetailPageState extends State<DetailPage>
                           : _calculateArrowColor(_scrollOffset),
                     ),
                     onPressed: () {
-                      Navigator.pop(context); 
+                      Navigator.pop(context);
                     },
                   ),
                   title: Opacity(
