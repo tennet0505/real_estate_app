@@ -191,7 +191,7 @@ class _DetailPageState extends State<DetailPage>
               Positioned(
                 top: 0,
                 left: 0,
-                width: 50,
+                width: MediaQuery.of(context).size.width,
                 child: AppBar(
                   leading: IconButton(
                     icon: Image.asset(
