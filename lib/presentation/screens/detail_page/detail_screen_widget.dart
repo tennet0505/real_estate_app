@@ -106,7 +106,7 @@ class _DetailPageState extends State<DetailPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                          height: 265,
+                          height: 270,
                           color: Theme.of(context)
                               .appBarTheme
                               .backgroundColor

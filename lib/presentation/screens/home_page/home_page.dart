@@ -23,6 +23,8 @@ class _HomePageState extends State<HomePage>
   final textEditingController = TextEditingController();
   bool isShowMap = false; // Move isShowMap to class-level
   House? selectedHouse;
+  final ScrollController _scrollController = ScrollController();
+  double _scrollOffset = 0.0;
 
   @override
   bool get wantKeepAlive => true;
@@ -37,6 +39,18 @@ class _HomePageState extends State<HomePage>
     textEditingController.addListener(() {
       context.read<HouseBloc>().add(SearchHouses(textEditingController.text));
     });
+    _scrollController.addListener(() {
+      setState(() {
+        _scrollOffset = _scrollController.offset;
+      });
+    });
+  }
+
+  double _calculateSearchBarOffset() {
+   if (_scrollOffset > 0) {
+      return -_scrollOffset / 2;
+    }
+    return 1;
   }
 
   Future<void> _onRefresh() async {
@@ -65,79 +79,97 @@ class _HomePageState extends State<HomePage>
       },
       child: Stack(
         children: [
-          BlocBuilder<HouseBloc, HouseState>(
-            builder: (context, state) {
-              if (state is HouseLoadingState) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColor.redColor,
+          Positioned(
+            top: _calculateSearchBarOffset(),
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: SearchWidget(
+                        textEditingController: textEditingController),
                   ),
-                );
-              } else if (state is HouseErrorState) {
-                return EmptyStateWidget(
-                  onRefresh: _onRefresh,
-                  message: state.message,
-                );
-              } else if (state is HouseState) {
-                return RefreshIndicator(
-                  color: AppColor.backgroundColorDarkTertiary,
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  onRefresh: _onRefresh,
-                  child: isShowMap
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 66),
-                          child: MapScreen(
-                            houses: List.from(state.houses),
-                            onHouseSelected: (House house) {
-                              _onHouseSelected(house);
-                            },
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.only(top: 54),
-                          itemCount: state.houses.length,
-                          itemExtent: 128,
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior.onDrag,
-                          itemBuilder: (context, index) {
-                            final house = state.houses[index];
-                            return ListItemWidget(house: house, state: state);
-                          },
-                        ),
-                );
-              } else {
-                return EmptyStateWidget(
-                  onRefresh: _onRefresh,
-                  showRefreshButton: true,
-                  message: AppLocal.somethingWentWrongTryRefresh.tr(),
-                );
-              }
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 0, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: SearchWidget(
-                      textEditingController: textEditingController),
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isShowMap = !isShowMap;
-                    });
-                  },
-                  icon: !isShowMap
-                      ? Icon(Icons.map,
-                          color: Theme.of(context).textTheme.titleLarge?.color)
-                      : Icon(Icons.list,
-                          color: Theme.of(context).textTheme.titleLarge?.color),
-                ),
-              ],
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isShowMap = !isShowMap;
+                      });
+                    },
+                    icon: !isShowMap
+                        ? Icon(Icons.map,
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color)
+                        : Icon(Icons.list,
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color),
+                  ),
+                ],
+              ),
             ),
           ),
+          Positioned(
+            top: _calculateSearchBarOffset(),
+            right: 0,
+            left: 0,
+            bottom: 0,
+            child: Padding(
+              padding: EdgeInsets.only(top: 56),
+              child: BlocBuilder<HouseBloc, HouseState>(
+                builder: (context, state) {
+                  if (state is HouseLoadingState) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColor.redColor,
+                      ),
+                    );
+                  } else if (state is HouseErrorState) {
+                    return EmptyStateWidget(
+                      onRefresh: _onRefresh,
+                      message: state.message,
+                    );
+                  } else if (state is HouseState) {
+                    return RefreshIndicator(
+                      color: AppColor.backgroundColorDarkTertiary,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      onRefresh: _onRefresh,
+                      child: isShowMap
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 0),
+                              child: MapScreen(
+                                houses: List.from(state.houses),
+                                onHouseSelected: (House house) {
+                                  _onHouseSelected(house);
+                                },
+                              ),
+                            )
+                          : ListView.builder(
+                              controller: _scrollController,
+                              // padding: const EdgeInsets.only(top: 54),
+                              itemCount: state.houses.length,
+                              itemExtent: 128,
+                              keyboardDismissBehavior:
+                                  ScrollViewKeyboardDismissBehavior.onDrag,
+                              itemBuilder: (context, index) {
+                                final house = state.houses[index];
+                                return ListItemWidget(house: house, state: state);
+                              },
+                            ),
+                    );
+                  } else {
+                    return EmptyStateWidget(
+                      onRefresh: _onRefresh,
+                      showRefreshButton: true,
+                      message: AppLocal.somethingWentWrongTryRefresh.tr(),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+          
           if (selectedHouse != null)
             Positioned(
               top: 0,
